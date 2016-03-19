@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"experimentalDecorators": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"noImplicitAny": true,
+		"outDir": "dist",
+		"removeComments": false,
+		"target": "es5"
+	},
+	"files": [
+		"src/readts.ts"
+	]
+}

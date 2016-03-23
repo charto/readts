@@ -2,11 +2,12 @@
 // Released under the MIT license, see LICENSE.
 
 import * as ts from 'typescript';
+import * as readts from './readts';
 
 /** Property, function / method parameter or variable. */
 
 export class IdentifierSpec {
-	constructor(name: string, type: string, doc: string) {
+	constructor(name: string, type: readts.TypeSpec, doc: string) {
 		this.name = name;
 		this.type = type;
 		if(doc) this.doc = doc;
@@ -15,7 +16,7 @@ export class IdentifierSpec {
 	/** Identifier name. */
 	name: string;
 	/** Type in TypeScript syntax. */
-	type: string;
+	type: readts.TypeSpec;
 	/** Interface members and function / method parameters may be optional. */
 	optional: boolean;
 	/** JSDoc comment. */

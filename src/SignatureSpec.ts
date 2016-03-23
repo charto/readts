@@ -5,7 +5,7 @@ import * as ts from 'typescript';
 import * as readts from './readts';
 
 export class SignatureSpec {
-	constructor(returnType: string, doc: string) {
+	constructor(returnType: readts.TypeSpec, doc: string) {
 		this.returnType = returnType;
 		if(doc) this.doc = doc;
 	}
@@ -17,7 +17,7 @@ export class SignatureSpec {
 	/** List of parameters. */
 	paramList: readts.IdentifierSpec[] = [];
 	/** Return type in TypeScript syntax. */
-	returnType: string;
+	returnType: readts.TypeSpec;
 	/** JSDoc comment. */
 	doc: string;
 }

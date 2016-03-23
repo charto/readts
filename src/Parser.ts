@@ -26,6 +26,8 @@ export class Parser {
 
 		this.program = ts.createProgram(config.fileNames, config.options);
 		this.checker = this.program.getTypeChecker();
+		this.moduleList = [];
+		this.symbolTbl = {};
 
 		for(var source of this.program.getSourceFiles()) {
 			// Skip contents of default library.
@@ -37,8 +39,28 @@ export class Parser {
 		return(this.moduleList);
 	}
 
-	private formatType(type: ts.Type) {
+	typeToString(type: ts.Type) {
 		return(this.checker.typeToString(type));
+	}
+
+	private addSymbol(name: string, data: any) {
+		if(!this.symbolTbl[name]) this.symbolTbl[name] = [];
+
+		this.symbolTbl[name].push(data);
+	}
+
+	getSymbol(symbol: ts.Symbol) {
+		for(var match of this.symbolTbl[symbol.getName()] || []) {
+			if(symbol == match.symbol) return(match);
+		}
+
+		return(null);
+	}
+
+	private formatType(type: ts.Type) {
+		var spec = new readts.TypeSpec(type, this);
+
+		return(spec);
 	}
 
 	private parseModule(node: ts.Node) {
@@ -100,7 +122,9 @@ export class Parser {
 	}
 
 	private parseClass(spec: SymbolSpec) {
-		var classSpec = new readts.ClassSpec(spec.name, spec.doc);
+		var classSpec = new readts.ClassSpec(spec.name, spec.symbol, spec.doc);
+
+		this.addSymbol(spec.name, classSpec);
 
 		for(var signature of spec.type.getConstructSignatures()) {
 			classSpec.addConstructor(this.parseSignature(signature));
@@ -167,7 +191,8 @@ export class Parser {
 		);
 	}
 
-	program: ts.Program;
-	checker: ts.TypeChecker;
-	moduleList: readts.ModuleSpec[] = [];
+	private program: ts.Program;
+	private checker: ts.TypeChecker;
+	private moduleList: readts.ModuleSpec[];
+	private symbolTbl: { [name: string]: any[] };
 }

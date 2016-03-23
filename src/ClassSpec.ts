@@ -5,8 +5,9 @@ import * as ts from 'typescript';
 import * as readts from './readts';
 
 export class ClassSpec {
-	constructor(name: string, doc: string) {
+	constructor(name: string, symbol: ts.Symbol, doc: string) {
 		this.name = name;
+		this.symbol = symbol;
 		if(doc) this.doc = doc;
 	}
 
@@ -29,6 +30,7 @@ export class ClassSpec {
 	}
 
 	name: string;
+	symbol: ts.Symbol;
 	construct: readts.FunctionSpec;
 	methodList: readts.FunctionSpec[];
 	propertyList: readts.IdentifierSpec[];

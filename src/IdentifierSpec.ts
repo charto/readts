@@ -7,6 +7,8 @@ import * as readts from './readts';
 /** Property, function / method parameter or variable. */
 
 export class IdentifierSpec {
+	/** @ignore internal use. */
+
 	constructor(name: string, type: readts.TypeSpec, doc: string) {
 		this.name = name;
 		this.type = type;
@@ -15,7 +17,7 @@ export class IdentifierSpec {
 
 	/** Identifier name. */
 	name: string;
-	/** Type in TypeScript syntax. */
+	/** Type definition. */
 	type: readts.TypeSpec;
 	/** Interface members and function / method parameters may be optional. */
 	optional: boolean;

@@ -13,13 +13,19 @@ interface SymbolSpec {
 	doc: string;
 }
 
+/** Main parser class with public methods, also holding its internal state. */
+
 export class Parser {
+	/** Parse a tsconfig.json file using TypeScript services API. */
+
 	parseConfig(tsconfigPath: string) {
 		var configJson = ts.parseConfigFileTextToJson(tsconfigPath, ts.sys.readFile(tsconfigPath)).config;
 		var config = ts.parseJsonConfigFileContent(configJson, ts.sys, tsconfigPath.replace(/[^/]+$/, ''), {}, tsconfigPath);
 
 		return(config);
 	}
+
+	/** Parse a TypeScript project using TypeScript services API and configuration. */
 
 	parse(config: ts.ParsedCommandLine): readts.ModuleSpec[] {
 		var sourceNum = 0;
@@ -39,17 +45,23 @@ export class Parser {
 		return(this.moduleList);
 	}
 
+	/** Convert an otherwise unrecognized type to string. @ignore internal use. */
+
 	typeToString(type: ts.Type) {
 		return(this.checker.typeToString(type));
 	}
 
-	private addSymbol(name: string, data: any) {
+	/** Add a class by name to symbol lookup table. */
+
+	private addSymbol(name: string, data: readts.ClassSpec) {
 		if(!this.symbolTbl[name]) this.symbolTbl[name] = [];
 
 		this.symbolTbl[name].push(data);
 	}
 
-	getSymbol(symbol: ts.Symbol) {
+	/** Look up previously seen class by symbol and its name. @ignore internal use. */
+
+	getSymbol(symbol: ts.Symbol): readts.ClassSpec {
 		for(var match of this.symbolTbl[symbol.getName()] || []) {
 			if(symbol == match.symbol) return(match);
 		}
@@ -57,7 +69,7 @@ export class Parser {
 		return(null);
 	}
 
-	private formatType(type: ts.Type) {
+	private parseType(type: ts.Type) {
 		var spec = new readts.TypeSpec(type, this);
 
 		return(spec);
@@ -112,6 +124,8 @@ export class Parser {
 		return(spec);
 	}
 
+	/** Get information about an AST node where a symbol is defined. */
+
 	private parseDeclaration(node: ts.Node) {
 		var symbol = this.checker.getSymbolAtLocation((<ts.DeclarationStatement>node).name);
 		var spec = this.parseSymbol(symbol);
@@ -145,7 +159,7 @@ export class Parser {
 			if(symbolFlags & ts.SymbolFlags.Method) {
 				classSpec.addMethod(this.parseFunction(spec));
 			} else if(symbolFlags & ts.SymbolFlags.Property) {
-				classSpec.addProperty(this.parseVariable(spec));
+				classSpec.addProperty(this.parseIdentifier(spec));
 			}
 		}
 
@@ -162,23 +176,25 @@ export class Parser {
 		return(funcSpec);
 	}
 
-	private parseVariable(spec: SymbolSpec) {
-		var varSpec = new readts.IdentifierSpec(spec.name, this.formatType(spec.type), spec.doc);
+	/** Parse property, function / method parameter or variable. */
+
+	private parseIdentifier(spec: SymbolSpec) {
+		var varSpec = new readts.IdentifierSpec(spec.name, this.parseType(spec.type), spec.doc);
 
 		return(varSpec);
 	}
 
-	/** Parse function or method signature. */
+	/** Parse function / method signature. */
 
 	private parseSignature(signature: ts.Signature) {
 		var signatureSpec = new readts.SignatureSpec(
-			this.formatType(signature.getReturnType()),
+			this.parseType(signature.getReturnType()),
 			this.parseComment(signature)
 		);
 
 		for(var param of signature.parameters) {
 			var spec = this.parseSymbol(param);
-			if(spec) signatureSpec.addParam(this.parseVariable(spec));
+			if(spec) signatureSpec.addParam(this.parseIdentifier(spec));
 		}
 
 		return(signatureSpec);
@@ -191,8 +207,11 @@ export class Parser {
 		);
 	}
 
+	/** TypeScript services API object. */
 	private program: ts.Program;
+	/** TypeScript services type checker. */
 	private checker: ts.TypeChecker;
+	/** List of modules found while parsing. */
 	private moduleList: readts.ModuleSpec[];
-	private symbolTbl: { [name: string]: any[] };
+	private symbolTbl: { [name: string]: readts.ClassSpec[] };
 }

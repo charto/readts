@@ -1,11 +1,12 @@
 {
   "name": "readts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "TypeScript exported definitions parser",
   "main": "dist/readts.js",
   "typings": "dist/readts.d.ts",
   "scripts": {
     "tsc": "tsc",
+    "docts": "docts",
     "prepublish": "tsc",
     "test": "node dist/readts.js"
   },
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/charto/readts#readme",
   "devDependencies": {
+    "docts": "~0.0.3",
     "typescript": "^1.8.7"
   }
 }

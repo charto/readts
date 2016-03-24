@@ -4,11 +4,17 @@
 import * as ts from 'typescript';
 import * as readts from './readts';
 
+/** Function or method signature defining input and output types. */
+
 export class SignatureSpec {
+	/** @ignore internal use. */
+
 	constructor(returnType: readts.TypeSpec, doc: string) {
 		this.returnType = returnType;
 		if(doc) this.doc = doc;
 	}
+
+	/** Add a new parameter and type. @ignore internal use. */
 
 	addParam(spec: readts.IdentifierSpec) {
 		this.paramList.push(spec);
@@ -16,7 +22,7 @@ export class SignatureSpec {
 
 	/** List of parameters. */
 	paramList: readts.IdentifierSpec[] = [];
-	/** Return type in TypeScript syntax. */
+	/** Return type definition. */
 	returnType: readts.TypeSpec;
 	/** JSDoc comment. */
 	doc: string;

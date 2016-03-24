@@ -1,6 +1,6 @@
 {
   "name": "readts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "TypeScript exported definitions parser",
   "main": "dist/readts.js",
   "typings": "dist/readts.d.ts",

@@ -38,7 +38,7 @@ API
 
 >
 > <a name="api-IdentifierSpec"></a>
-> ### [`IdentifierSpec`](#api-IdentifierSpec)
+> ### Class [`IdentifierSpec`](#api-IdentifierSpec)
 > <em>Property, function / method parameter or variable.</em>  
 >  
 > Properties:  
@@ -52,7 +52,7 @@ API
 > > &emsp;<em>JSDoc comment.</em>  
 >
 > <a name="api-SignatureSpec"></a>
-> ### [`SignatureSpec`](#api-SignatureSpec)
+> ### Class [`SignatureSpec`](#api-SignatureSpec)
 > <em>Function or method signature defining input and output types.</em>  
 >  
 > Properties:  
@@ -64,7 +64,7 @@ API
 > > &emsp;<em>JSDoc comment.</em>  
 >
 > <a name="api-FunctionSpec"></a>
-> ### [`FunctionSpec`](#api-FunctionSpec)
+> ### Class [`FunctionSpec`](#api-FunctionSpec)
 > <em>Function or method with any number of overloaded signatures.</em>  
 >  
 > Properties:  
@@ -74,7 +74,7 @@ API
 > > &emsp;<em>List of signatures, one for each overload.</em>  
 >
 > <a name="api-ClassSpec"></a>
-> ### [`ClassSpec`](#api-ClassSpec)
+> ### Class [`ClassSpec`](#api-ClassSpec)
 > <em>Class or interface and its members.</em>  
 >  
 > Properties:  
@@ -90,7 +90,7 @@ API
 > > &emsp;<em>JSDoc comment.</em>  
 >
 > <a name="api-ModuleSpec"></a>
-> ### [`ModuleSpec`](#api-ModuleSpec)
+> ### Class [`ModuleSpec`](#api-ModuleSpec)
 > <em>Module or source file.</em>  
 >  
 > Methods:  
@@ -101,13 +101,15 @@ API
 > Properties:  
 > > **.classList** <sup><code>[ClassSpec](#api-ClassSpec)[]</code></sup>  
 > > &emsp;<em>Definitions of exported classes.</em>  
+> > **.interfaceList** <sup><code>[ClassSpec](#api-ClassSpec)[]</code></sup>  
+> > &emsp;<em>Definitions of exported interfaces.</em>  
 > > **.functionList** <sup><code>[FunctionSpec](#api-FunctionSpec)[]</code></sup>  
 > > &emsp;<em>Definitions of exported functions.</em>  
 > > **.variableList** <sup><code>[IdentifierSpec](#api-IdentifierSpec)[]</code></sup>  
 > > &emsp;<em>Definitions of exported variables.</em>  
 >
 > <a name="api-FormatHooks"></a>
-> ### [`FormatHooks`](#api-FormatHooks)
+> ### Interface [`FormatHooks`](#api-FormatHooks)
 > <em>Hooks to change how parts of type definitions are converted to strings.</em>  
 >  
 > Properties:  
@@ -116,7 +118,7 @@ API
 > > **.union** <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
 >
 > <a name="api-TypeSpec"></a>
-> ### [`TypeSpec`](#api-TypeSpec)
+> ### Class [`TypeSpec`](#api-TypeSpec)
 > <em>Type definition.</em>  
 >  
 > Methods:  
@@ -136,7 +138,7 @@ API
 > > &emsp;<em>If the type is an array, its element type.</em>  
 >
 > <a name="api-RefSpec"></a>
-> ### [`RefSpec`](#api-RefSpec)
+> ### Interface [`RefSpec`](#api-RefSpec)
 >  
 > Properties:  
 > > **.name** <sup><code>string</code></sup>  
@@ -144,7 +146,7 @@ API
 > > **.class** <sup><code>[ClassSpec](#api-ClassSpec)</code></sup>  
 >
 > <a name="api-Parser"></a>
-> ### [`Parser`](#api-Parser)
+> ### Class [`Parser`](#api-Parser)
 > <em>Main parser class with public methods, also holding its internal state.</em>  
 >  
 > Methods:  

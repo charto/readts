@@ -13,11 +13,18 @@ export class ModuleSpec {
 		this.classList.push(spec);
 	}
 
+	/** Add an exported interface. @ignore internal use. */
+
+	addInterface(spec: readts.ClassSpec) {
+		this.interfaceList.push(spec);
+	}
+
 	/** Test if nothing is exported. */
 
 	isEmpty() {
 		return(
 			!this.classList.length &&
+			!this.interfaceList.length &&
 			!this.functionList.length &&
 			!this.variableList.length
 		);
@@ -25,6 +32,8 @@ export class ModuleSpec {
 
 	/** Definitions of exported classes. */
 	classList: readts.ClassSpec[] = [];
+	/** Definitions of exported interfaces. */
+	interfaceList: readts.ClassSpec[] = [];
 	/** Definitions of exported functions. */
 	functionList: readts.FunctionSpec[] = [];
 	/** Definitions of exported variables. */

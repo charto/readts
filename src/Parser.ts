@@ -110,7 +110,11 @@ export class Parser {
 				var spec = this.parseDeclaration(node);
 				if(spec) {
 					var classSpec = this.parseClass(spec);
-					if(classSpec) moduleSpec.addClass(classSpec);
+					if(classSpec) {
+						if(node.kind == ts.SyntaxKind.InterfaceDeclaration) {
+							moduleSpec.addInterface(classSpec);
+						} else moduleSpec.addClass(classSpec);
+					}
 				}
 				break;
 
@@ -126,10 +130,12 @@ export class Parser {
 
 	private parseSymbol(symbol: ts.Symbol) {
 		var declaration = symbol.valueDeclaration;
+		var type: ts.Type = null;
 
-		if(!declaration) return(null);
-
-		var type = this.checker.getTypeOfSymbolAtLocation(symbol, declaration);
+		// Interfaces have no value declaration.
+		if(declaration) {
+			type = this.checker.getTypeOfSymbolAtLocation(symbol, declaration);
+		}
 
 		var spec: SymbolSpec = {
 			symbol: symbol,
@@ -158,8 +164,11 @@ export class Parser {
 
 		this.getRef(spec.symbol, { class: classSpec });
 
-		for(var signature of spec.type.getConstructSignatures()) {
-			classSpec.addConstructor(this.parseSignature(signature));
+		// Interfaces have no value type.
+		if(spec.type) {
+			for(var signature of spec.type.getConstructSignatures()) {
+				classSpec.addConstructor(this.parseSignature(signature));
+			}
 		}
 
 		var memberTbl = spec.symbol.members;
@@ -169,10 +178,13 @@ export class Parser {
 
 			if(!spec) continue;
 
-			var symbolFlags = spec.symbol.getFlags();
-			var declFlags = spec.declaration.flags;
+			if(spec.declaration) {
+				var declFlags = spec.declaration.flags;
 
-			if(declFlags & ts.NodeFlags.Private) continue;
+				if(declFlags & ts.NodeFlags.Private) continue;
+			}
+
+			var symbolFlags = spec.symbol.getFlags();
 
 			if(symbolFlags & ts.SymbolFlags.Method) {
 				classSpec.addMethod(this.parseFunction(spec));

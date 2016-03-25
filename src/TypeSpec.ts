@@ -9,7 +9,7 @@ import * as readts from './readts';
 export interface FormatHooks {
 	[name: string]: (spec: TypeSpec, hooks: FormatHooks) => string;
 
-	class?: (spec: TypeSpec, hooks: FormatHooks) => string;
+	ref?: (spec: TypeSpec, hooks: FormatHooks) => string;
 	array?: (spec: TypeSpec, hooks: FormatHooks) => string;
 	union?: (spec: TypeSpec, hooks: FormatHooks) => string;
 }
@@ -37,10 +37,7 @@ export class TypeSpec {
 	}
 
 	private parseClass(type: ts.Type, parser: readts.Parser) {
-		var spec = parser.getSymbol(type.symbol);
-
-		if(spec) this.class = spec;
-		else this.name = parser.typeToString(type);
+		this.ref = parser.getRef(type.symbol);
 	}
 
 	private parseReference(type: ts.TypeReference, parser: readts.Parser) {
@@ -60,7 +57,7 @@ export class TypeSpec {
 
 	format(hooks?: FormatHooks, needParens?: boolean): string {
 		if(this.name) return(this.name);
-		if(this.class) return(hooks && hooks.class ? hooks.class(this, hooks) : this.class.name);
+		if(this.ref) return(hooks && hooks.ref ? hooks.ref(this, hooks) : this.ref.name);
 		if(this.arrayOf) return(hooks && hooks.array ? hooks.array(this, hooks) : this.arrayOf.format(hooks, true) + '[]');
 
 		var output: string;
@@ -74,8 +71,8 @@ export class TypeSpec {
 
 	/** Name of the type, only present if not composed of other type or class etc. */
 	name: string;
-	/** If the type refers to a class, its definition. */
-	class: readts.ClassSpec;
+	/** Definition of what the type points to, if available. */
+	ref: readts.RefSpec;
 	/** If the type is a union, list of the possible types. */
 	unionOf: TypeSpec[];
 	/** If the type is an array, its element type. */

@@ -13,6 +13,14 @@ interface SymbolSpec {
 	doc: string;
 }
 
+export interface RefSpec {
+	[key: string]: any;
+
+	name?: string;
+	symbol?: ts.Symbol;
+	class?: readts.ClassSpec;
+}
+
 /** Main parser class with public methods, also holding its internal state. */
 
 export class Parser {
@@ -51,22 +59,32 @@ export class Parser {
 		return(this.checker.typeToString(type));
 	}
 
-	/** Add a class by name to symbol lookup table. */
+	/** Get or change reference for a symbol. @ignore internal use. */
 
-	private addSymbol(name: string, data: readts.ClassSpec) {
-		if(!this.symbolTbl[name]) this.symbolTbl[name] = [];
+	getRef(symbol: ts.Symbol, ref?: RefSpec) {
+		var name = symbol.getName();
+		var symbolList = this.symbolTbl[name];
 
-		this.symbolTbl[name].push(data);
-	}
+		if(!symbolList) {
+			symbolList = [];
+			this.symbolTbl[name] = symbolList;
+		} else {
+			for(var match of symbolList) {
+				if(symbol == match.symbol) {
+					if(ref) for(var key of Object.keys(ref)) match[key] = ref[key];
 
-	/** Look up previously seen class by symbol and its name. @ignore internal use. */
-
-	getSymbol(symbol: ts.Symbol): readts.ClassSpec {
-		for(var match of this.symbolTbl[symbol.getName()] || []) {
-			if(symbol == match.symbol) return(match);
+					return(match);
+				}
+			}
 		}
 
-		return(null);
+		if(!ref) ref = {};
+
+		ref.name = name;
+		ref.symbol = symbol;
+		symbolList.push(ref);
+
+		return(ref);
 	}
 
 	private parseType(type: ts.Type) {
@@ -138,7 +156,7 @@ export class Parser {
 	private parseClass(spec: SymbolSpec) {
 		var classSpec = new readts.ClassSpec(spec.name, spec.symbol, spec.doc);
 
-		this.addSymbol(spec.name, classSpec);
+		this.getRef(spec.symbol, { class: classSpec });
 
 		for(var signature of spec.type.getConstructSignatures()) {
 			classSpec.addConstructor(this.parseSignature(signature));
@@ -213,5 +231,5 @@ export class Parser {
 	private checker: ts.TypeChecker;
 	/** List of modules found while parsing. */
 	private moduleList: readts.ModuleSpec[];
-	private symbolTbl: { [name: string]: readts.ClassSpec[] };
+	private symbolTbl: { [name: string]: RefSpec[] };
 }

@@ -189,7 +189,7 @@ export class Parser {
 			if(symbolFlags & ts.SymbolFlags.Method) {
 				classSpec.addMethod(this.parseFunction(spec));
 			} else if(symbolFlags & ts.SymbolFlags.Property) {
-				classSpec.addProperty(this.parseIdentifier(spec));
+				classSpec.addProperty(this.parseIdentifier(spec, !!(symbolFlags & ts.SymbolFlags.Optional)));
 			}
 		}
 
@@ -208,9 +208,8 @@ export class Parser {
 
 	/** Parse property, function / method parameter or variable. */
 
-	private parseIdentifier(spec: SymbolSpec) {
-		var varSpec = new readts.IdentifierSpec(spec.name, this.parseType(spec.type), spec.doc);
-
+	private parseIdentifier(spec: SymbolSpec, optional: boolean) {
+		var varSpec = new readts.IdentifierSpec(spec.name, this.parseType(spec.type), optional, spec.doc);
 		return(varSpec);
 	}
 
@@ -224,7 +223,7 @@ export class Parser {
 
 		for(var param of signature.parameters) {
 			var spec = this.parseSymbol(param);
-			if(spec) signatureSpec.addParam(this.parseIdentifier(spec));
+			if(spec) signatureSpec.addParam(this.parseIdentifier(spec, this.checker.isOptionalParameter(spec.declaration as ts.ParameterDeclaration)));
 		}
 
 		return(signatureSpec);

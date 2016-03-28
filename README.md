@@ -113,9 +113,9 @@ API
 > <em>Hooks to change how parts of type definitions are converted to strings.</em>  
 >  
 > Properties:  
-> > **.ref** <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
-> > **.array** <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
-> > **.union** <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
+> > **.ref**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
+> > **.array**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
+> > **.union**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
 >
 > <a name="api-TypeSpec"></a>
 > ### Class [`TypeSpec`](#api-TypeSpec)
@@ -124,8 +124,8 @@ API
 > Methods:  
 > > **.format( )** <sup>&rArr; <code>string</code></sup>  
 > > &emsp;<em>Convert to string, with optional hooks replacing default formatting code.</em>  
-> > &emsp;&#x25aa; hooks <sup><code>[FormatHooks](#api-FormatHooks)</code></sup>  
-> > &emsp;&#x25aa; needParens <sup><code>boolean</code></sup>  
+> > &emsp;&#x25ab; hooks<sub>?</sub> <sup><code>[FormatHooks](#api-FormatHooks)</code></sup>  
+> > &emsp;&#x25ab; needParens<sub>?</sub> <sup><code>boolean</code></sup>  
 >  
 > Properties:  
 > > **.name** <sup><code>string</code></sup>  
@@ -141,9 +141,9 @@ API
 > ### Interface [`RefSpec`](#api-RefSpec)
 >  
 > Properties:  
-> > **.name** <sup><code>string</code></sup>  
-> > **.symbol** <sup><code>Symbol</code></sup>  
-> > **.class** <sup><code>[ClassSpec](#api-ClassSpec)</code></sup>  
+> > **.name**<sub>?</sub> <sup><code>string</code></sup>  
+> > **.symbol**<sub>?</sub> <sup><code>Symbol</code></sup>  
+> > **.class**<sub>?</sub> <sup><code>[ClassSpec](#api-ClassSpec)</code></sup>  
 >
 > <a name="api-Parser"></a>
 > ### Class [`Parser`](#api-Parser)

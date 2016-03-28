@@ -9,9 +9,10 @@ import * as readts from './readts';
 export class IdentifierSpec {
 	/** @ignore internal use. */
 
-	constructor(name: string, type: readts.TypeSpec, doc: string) {
+	constructor(name: string, type: readts.TypeSpec, optional: boolean, doc: string) {
 		this.name = name;
 		this.type = type;
+		this.optional = optional;
 		if(doc) this.doc = doc;
 	}
 

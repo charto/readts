@@ -6,6 +6,7 @@ readts
 
 This is a TypeScript exported class, function, type and documentation parser.
 It outputs everything needed to automatically generate documentation and better understand a project's public API.
+Information is extracted using TypeScript's [Compiler API](https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API).
 
 Usage
 -----

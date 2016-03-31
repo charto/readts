@@ -105,6 +105,14 @@ export class Parser {
 
 	private parseTopNode(node: ts.Node, moduleSpec: readts.ModuleSpec) {
 		switch(node.kind) {
+			case ts.SyntaxKind.FunctionDeclaration:
+				var spec = this.parseDeclaration(node);
+				if(spec) {
+					var functionSpec = this.parseFunction(spec);
+					if(functionSpec) moduleSpec.addFunction(functionSpec);
+				}
+				break;
+
 			case ts.SyntaxKind.ClassDeclaration:
 			case ts.SyntaxKind.InterfaceDeclaration:
 				var spec = this.parseDeclaration(node);

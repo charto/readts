@@ -19,6 +19,12 @@ export class ModuleSpec {
 		this.interfaceList.push(spec);
 	}
 
+	/** Add an exported function. @ignore internal use. */
+
+	addFunction(spec: readts.FunctionSpec) {
+		this.functionList.push(spec);
+	}
+
 	/** Test if nothing is exported. */
 
 	isEmpty() {

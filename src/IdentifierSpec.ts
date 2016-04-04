@@ -4,20 +4,24 @@
 import * as ts from 'typescript';
 import * as readts from './readts';
 
+import {SymbolSpec} from './Parser';
+
 /** Property, function / method parameter or variable. */
 
 export class IdentifierSpec {
 	/** @ignore internal use. */
 
-	constructor(name: string, type: readts.TypeSpec, optional: boolean, doc: string) {
-		this.name = name;
+	constructor(spec: SymbolSpec, type: readts.TypeSpec, optional: boolean) {
+		this.name = spec.name;
 		this.type = type;
 		this.optional = optional;
-		if(doc) this.doc = doc;
+		this.pos = spec.pos;
+		if(spec.doc) this.doc = spec.doc;
 	}
 
 	/** Identifier name. */
 	name: string;
+	pos: readts.SourcePos;
 	/** Type definition. */
 	type: readts.TypeSpec;
 	/** Interface members and function / method parameters may be optional. */

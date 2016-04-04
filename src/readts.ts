@@ -7,4 +7,4 @@ export {FunctionSpec} from './FunctionSpec';
 export {ClassSpec} from './ClassSpec';
 export {ModuleSpec} from './ModuleSpec';
 export {TypeSpec, FormatHooks} from './TypeSpec';
-export {Parser, RefSpec} from './Parser';
+export {Parser, SourcePos, RefSpec} from './Parser';

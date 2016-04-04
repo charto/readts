@@ -4,12 +4,20 @@
 import * as ts from 'typescript';
 import * as readts from './readts';
 
-interface SymbolSpec {
-	node?: ts.Node;
+export interface SourcePos {
+	sourcePath: string;
+	firstLine: number;
+	lastLine: number;
+}
+
+/** @ignore internal use. */
+
+export interface SymbolSpec {
 	name: string;
 	symbol: ts.Symbol;
 	declaration: ts.Declaration;
 	type: ts.Type;
+	pos: SourcePos;
 	doc: string;
 }
 
@@ -35,7 +43,11 @@ export class Parser {
 
 	/** Parse a TypeScript project using TypeScript services API and configuration. */
 
-	parse(config: ts.ParsedCommandLine): readts.ModuleSpec[] {
+	parse(
+		config: ts.ParsedCommandLine,
+		nameFilter?: (pathName: string) => boolean,
+		extension?: string
+	): readts.ModuleSpec[] {
 		var sourceNum = 0;
 
 		this.program = ts.createProgram(config.fileNames, config.options);
@@ -44,10 +56,17 @@ export class Parser {
 		this.symbolTbl = {};
 
 		for(var source of this.program.getSourceFiles()) {
-			// Skip contents of default library.
+			// Skip contents of the default library.
 			if(sourceNum++ == 0) continue;
 
-			this.parseModule(source);
+			// Call optional filter to check if file should be parsed.
+			if(
+				!nameFilter ||
+				!extension ||
+				nameFilter((ts as any).getOwnEmitOutputFilePath(source, this.program, extension))
+			) {
+				this.parseSource(source);
+			}
 		}
 
 		return(this.moduleList);
@@ -93,20 +112,41 @@ export class Parser {
 		return(spec);
 	}
 
-	private parseModule(node: ts.Node) {
-		var spec = new readts.ModuleSpec();
+	private parseSource(source: ts.SourceFile) {
+		var symbol = (source as any).symbol as ts.Symbol;
+		if(!symbol) return;
 
-		ts.forEachChild(node, (node: ts.Node) => this.parseTopNode(node, spec));
+		var exportTbl = symbol.exports;
 
-		if(!spec.isEmpty()) this.moduleList.push(spec);
+		for(var name of Object.keys(exportTbl).sort()) {
+			var spec = this.parseSymbol(exportTbl[name]);
+
+			// Resolve aliases.
+			while(1) {
+				var symbolFlags = spec.symbol.getFlags();
+
+				if(symbolFlags & ts.SymbolFlags.Alias) {
+					spec = this.parseSymbol(this.checker.getAliasedSymbol(spec.symbol));
+				} else break;
+			}
+
+			if(spec.declaration) {
+				var module = new readts.ModuleSpec();
+
+				this.parseDeclaration(spec, module);
+
+				this.moduleList.push(module);
+			}
+		}
 	}
 
-	/** Find classes and interfaces in module's top-level scope. */
+	/** Extract declared function, class or interface from a symbol. */
 
-	private parseTopNode(node: ts.Node, moduleSpec: readts.ModuleSpec) {
+	private parseDeclaration(spec: SymbolSpec, moduleSpec: readts.ModuleSpec) {
+		var node = spec.declaration as ts.Node;
+
 		switch(node.kind) {
 			case ts.SyntaxKind.FunctionDeclaration:
-				var spec = this.parseDeclaration(node);
 				if(spec) {
 					var functionSpec = this.parseFunction(spec);
 					if(functionSpec) moduleSpec.addFunction(functionSpec);
@@ -115,7 +155,6 @@ export class Parser {
 
 			case ts.SyntaxKind.ClassDeclaration:
 			case ts.SyntaxKind.InterfaceDeclaration:
-				var spec = this.parseDeclaration(node);
 				if(spec) {
 					var classSpec = this.parseClass(spec);
 					if(classSpec) {
@@ -125,10 +164,6 @@ export class Parser {
 					}
 				}
 				break;
-
-			case ts.SyntaxKind.ModuleDeclaration:
-				this.parseModule(node);
-				break;
 		}
 	}
 
@@ -136,12 +171,26 @@ export class Parser {
 		return(ts.displayPartsToString(symbol.getDocumentationComment()).trim());
 	}
 
+	private parsePos(node: ts.Declaration): SourcePos {
+		var source = node.getSourceFile();
+
+		return({
+			sourcePath: source.fileName,
+			firstLine: ts.getLineAndCharacterOfPosition(source, node.getStart()).line + 1,
+			lastLine: ts.getLineAndCharacterOfPosition(source, node.getEnd()).line + 1
+		});
+	}
+
 	private parseSymbol(symbol: ts.Symbol) {
 		var declaration = symbol.valueDeclaration;
 		var type: ts.Type = null;
+		var pos: SourcePos = null;
 
 		// Interfaces have no value declaration.
+		if(!declaration) declaration = symbol.getDeclarations()[0];
+
 		if(declaration) {
+			pos = this.parsePos(declaration);
 			type = this.checker.getTypeOfSymbolAtLocation(symbol, declaration);
 		}
 
@@ -150,25 +199,15 @@ export class Parser {
 			declaration: declaration,
 			type: type,
 			name: symbol.getName(),
+			pos: pos,
 			doc: this.parseComment(symbol)
 		};
 
 		return(spec);
 	}
 
-	/** Get information about an AST node where a symbol is defined. */
-
-	private parseDeclaration(node: ts.Node) {
-		var symbol = this.checker.getSymbolAtLocation((<ts.DeclarationStatement>node).name);
-		var spec = this.parseSymbol(symbol);
-
-		if(spec) spec.node = node;
-
-		return(spec);
-	}
-
 	private parseClass(spec: SymbolSpec) {
-		var classSpec = new readts.ClassSpec(spec.name, spec.symbol, spec.doc);
+		var classSpec = new readts.ClassSpec(spec);
 
 		this.getRef(spec.symbol, { class: classSpec });
 
@@ -205,7 +244,7 @@ export class Parser {
 	}
 
 	private parseFunction(spec: SymbolSpec) {
-		var funcSpec = new readts.FunctionSpec(spec.name);
+		var funcSpec = new readts.FunctionSpec(spec);
 
 		for(var signature of spec.type.getCallSignatures()) {
 			funcSpec.addSignature(this.parseSignature(signature));
@@ -217,14 +256,20 @@ export class Parser {
 	/** Parse property, function / method parameter or variable. */
 
 	private parseIdentifier(spec: SymbolSpec, optional: boolean) {
-		var varSpec = new readts.IdentifierSpec(spec.name, this.parseType(spec.type), optional, spec.doc);
+		var varSpec = new readts.IdentifierSpec(spec, this.parseType(spec.type), optional);
 		return(varSpec);
 	}
 
 	/** Parse function / method signature. */
 
 	private parseSignature(signature: ts.Signature) {
+		var pos: SourcePos;
+		var declaration = signature.getDeclaration();
+
+		if(declaration) pos = this.parsePos(declaration);
+
 		var signatureSpec = new readts.SignatureSpec(
+			pos,
 			this.parseType(signature.getReturnType()),
 			this.parseComment(signature)
 		);

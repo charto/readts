@@ -4,13 +4,17 @@
 import * as ts from 'typescript';
 import * as readts from './readts';
 
+import {SymbolSpec} from './Parser';
+
 /** Function or method with any number of overloaded signatures. */
 
 export class FunctionSpec {
 	/** @ignore internal use. */
 
-	constructor(name: string) {
-		if(name) this.name = name;
+	constructor(spec: SymbolSpec) {
+		if(spec) {
+			this.name = spec.name;
+		}
 	}
 
 	/** Add a new signature. @ignore internal use. */

@@ -4,15 +4,19 @@
 import * as ts from 'typescript';
 import * as readts from './readts';
 
+import {SymbolSpec} from './Parser';
+
 /** Class or interface and its members. */
 
 export class ClassSpec {
 	/** @ignore internal use. */
 
-	constructor(name: string, symbol: ts.Symbol, doc: string) {
-		this.name = name;
-		this.symbol = symbol;
-		if(doc) this.doc = doc;
+	constructor(spec: SymbolSpec) {
+		this.name = spec.name;
+		this.pos = spec.pos;
+		this.symbol = spec.symbol;
+
+		if(spec.doc) this.doc = spec.doc;
 	}
 
 	/** Add constructor signature. @ignore internal use. */
@@ -41,6 +45,7 @@ export class ClassSpec {
 
 	/** Class name. */
 	name: string;
+	pos: readts.SourcePos;
 	/** Symbol from TypeScript services. @ignore internal use. */
 	symbol: ts.Symbol;
 	/** Constructor function. */

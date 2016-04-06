@@ -60,13 +60,15 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-FormatHooks"></a>
 > ### Interface [`FormatHooks`](#api-FormatHooks)
 > <em>Hooks to change how parts of type definitions are converted to strings.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/develop/src/TypeSpec.ts#L9-L16)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/1162bd5/src/TypeSpec.ts#L11-L20)  
 >  
 > Properties:  
-> > **.ref**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
-> > **.array**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
-> > **.union**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
-> > **.intersection**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
+> > **.unknown**<sub>?</sub> <sup><code>(spec: TypeSpec, output?: string, hooks?: FormatHooks) =&gt; string</code></sup>  
+> > **.ref**<sub>?</sub> <sup><code>(spec: TypeSpec, output?: string, hooks?: FormatHooks) =&gt; string</code></sup>  
+> > **.array**<sub>?</sub> <sup><code>(spec: TypeSpec, output?: string, hooks?: FormatHooks) =&gt; string</code></sup>  
+> > **.union**<sub>?</sub> <sup><code>(spec: TypeSpec, output?: string, hooks?: FormatHooks) =&gt; string</code></sup>  
+> > **.intersection**<sub>?</sub> <sup><code>(spec: TypeSpec, output?: string, hooks?: FormatHooks) =&gt; string</code></sup>  
+> > **.generic**<sub>?</sub> <sup><code>(spec: TypeSpec, output?: string, hooks?: FormatHooks) =&gt; string</code></sup>  
 >
 > <a name="api-FunctionSpec"></a>
 > ### Class [`FunctionSpec`](#api-FunctionSpec)
@@ -126,7 +128,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/b2ca837/src/Parser.ts#L46-L73)  
 > > &emsp;<em>Parse a TypeScript project using TypeScript services API and configuration.</em>  
 > > &emsp;&#x25aa; config <sup><code>ParsedCommandLine</code></sup>  
-> > &emsp;&#x25ab; nameFilter<sub>?</sub> <sup><code>(pathName: string) => boolean</code></sup>  
+> > &emsp;&#x25ab; nameFilter<sub>?</sub> <sup><code>(pathName: string) =&gt; boolean</code></sup>  
 > > &emsp;&#x25ab; extension<sub>?</sub> <sup><code>string</code></sup>  
 >
 > <a name="api-RefSpec"></a>
@@ -164,10 +166,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-TypeSpec"></a>
 > ### Class [`TypeSpec`](#api-TypeSpec)
 > <em>Type definition.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/develop/src/TypeSpec.ts#L20-L103)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/1162bd5/src/TypeSpec.ts#L24-L123)  
 >  
 > Methods:  
-> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/develop/src/TypeSpec.ts#L63-L91)  
+> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/1162bd5/src/TypeSpec.ts#L68-L109)  
 > > &emsp;<em>Convert to string, with optional hooks replacing default formatting code.</em>  
 > > &emsp;&#x25ab; hooks<sub>?</sub> <sup><code>[FormatHooks](#api-FormatHooks)</code></sup>  
 > > &emsp;&#x25ab; needParens<sub>?</sub> <sup><code>boolean</code></sup>  
@@ -183,6 +185,8 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > > &emsp;<em>If the type is an intersection, list of the possible types.</em>  
 > > **.arrayOf** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
 > > &emsp;<em>If the type is an array, its element type.</em>  
+> > **.argumentList** <sup><code>[TypeSpec](#api-TypeSpec)[]</code></sup>  
+> > &emsp;<em>Arguments of a generic type.</em>  
 
 License
 =======

@@ -12,6 +12,7 @@ export interface FormatHooks {
 	ref?: (spec: TypeSpec, hooks: FormatHooks) => string;
 	array?: (spec: TypeSpec, hooks: FormatHooks) => string;
 	union?: (spec: TypeSpec, hooks: FormatHooks) => string;
+	intersection?: (spec: TypeSpec, hooks: FormatHooks) => string;
 }
 
 /** Type definition. */
@@ -31,8 +32,10 @@ export class TypeSpec {
 		} else if (type.flags & (tf.Class | tf.Interface | tf.Enum | tf.TypeParameter)) {
 			this.parseClass(type, parser);
 		} else if (type.flags & tf.Tuple) {
-		} else if (type.flags & tf.UnionOrIntersection) {
-			this.parseUnion(type as ts.UnionOrIntersectionType, parser);
+		} else if (type.flags & tf.Union) {
+			this.unionOf = this.parseList(type as ts.UnionOrIntersectionType, parser);
+		} else if (type.flags & tf.Intersection) {
+			this.intersectionOf = this.parseList(type as ts.UnionOrIntersectionType, parser);
 		}
 	}
 
@@ -49,20 +52,36 @@ export class TypeSpec {
 		} else this.parseClass(type, parser);
 	}
 
-	private parseUnion(type: ts.UnionOrIntersectionType, parser: readts.Parser) {
-		this.unionOf = type.types.map((type: ts.Type) => new TypeSpec(type, parser));
+	private parseList(type: ts.UnionOrIntersectionType, parser: readts.Parser) {
+		return(type.types.map((type: ts.Type) => new TypeSpec(type, parser)));
 	}
 
 	/** Convert to string, with optional hooks replacing default formatting code. */
 
 	format(hooks?: FormatHooks, needParens?: boolean): string {
 		if(this.name) return(this.name);
-		if(this.ref) return(hooks && hooks.ref ? hooks.ref(this, hooks) : this.ref.name);
-		if(this.arrayOf) return(hooks && hooks.array ? hooks.array(this, hooks) : this.arrayOf.format(hooks, true) + '[]');
+		if(this.ref) {
+			return(hooks && hooks.ref ? hooks.ref(this, hooks) :
+				this.ref.name
+			);
+		}
+		if(this.arrayOf) {
+			return(hooks && hooks.array ? hooks.array(this, hooks) :
+				this.arrayOf.format(hooks, true) + '[]'
+			);
+		}
 
 		var output: string;
 
-		if(this.unionOf) output = hooks && hooks.union ? hooks.union(this, hooks) : this.unionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' | ');
+		if(this.unionOf) {
+			output = hooks && hooks.union ? hooks.union(this, hooks) :
+				this.unionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' | ');
+		}
+
+		if(this.intersectionOf) {
+			output = hooks && hooks.intersection ? hooks.intersection(this, hooks) :
+				this.intersectionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' & ');
+		}
 
 		if(needParens) output = '(' + output + ')';
 
@@ -75,6 +94,8 @@ export class TypeSpec {
 	ref: readts.RefSpec;
 	/** If the type is a union, list of the possible types. */
 	unionOf: TypeSpec[];
+	/** If the type is an intersection, list of the possible types. */
+	intersectionOf: TypeSpec[];
 	/** If the type is an array, its element type. */
 	arrayOf: TypeSpec;
 }

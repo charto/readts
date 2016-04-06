@@ -4,15 +4,19 @@
 import * as ts from 'typescript';
 import * as readts from './readts';
 
+export type FormatHook = (spec: TypeSpec, output?: string, hooks?: FormatHooks) => string;
+
 /** Hooks to change how parts of type definitions are converted to strings. */
 
 export interface FormatHooks {
-	[name: string]: (spec: TypeSpec, hooks: FormatHooks) => string;
+	[name: string]: FormatHook;
 
-	ref?: (spec: TypeSpec, hooks: FormatHooks) => string;
-	array?: (spec: TypeSpec, hooks: FormatHooks) => string;
-	union?: (spec: TypeSpec, hooks: FormatHooks) => string;
-	intersection?: (spec: TypeSpec, hooks: FormatHooks) => string;
+	unknown?: FormatHook;
+	ref?: FormatHook;
+	array?: FormatHook;
+	union?: FormatHook;
+	intersection?: FormatHook;
+	generic?: FormatHook;
 }
 
 /** Type definition. */
@@ -33,9 +37,9 @@ export class TypeSpec {
 			this.parseClass(type, parser);
 		} else if (type.flags & tf.Tuple) {
 		} else if (type.flags & tf.Union) {
-			this.unionOf = this.parseList(type as ts.UnionOrIntersectionType, parser);
+			this.unionOf = this.parseList((type as ts.UnionOrIntersectionType).types, parser);
 		} else if (type.flags & tf.Intersection) {
-			this.intersectionOf = this.parseList(type as ts.UnionOrIntersectionType, parser);
+			this.intersectionOf = this.parseList((type as ts.UnionOrIntersectionType).types, parser);
 		}
 	}
 
@@ -49,43 +53,59 @@ export class TypeSpec {
 		// so just check the name.
 		if(type.target.symbol.getName() == 'Array' && type.typeArguments) {
 			this.arrayOf = new TypeSpec(type.typeArguments[0], parser);
-		} else this.parseClass(type, parser);
+		} else {
+			this.parseClass(type, parser);
+			if(type.typeArguments) this.argumentList = this.parseList(type.typeArguments, parser);
+		}
 	}
 
-	private parseList(type: ts.UnionOrIntersectionType, parser: readts.Parser) {
-		return(type.types.map((type: ts.Type) => new TypeSpec(type, parser)));
+	private parseList(typeList: ts.Type[], parser: readts.Parser) {
+		return(typeList.map((type: ts.Type) => new TypeSpec(type, parser)));
 	}
 
 	/** Convert to string, with optional hooks replacing default formatting code. */
 
 	format(hooks?: FormatHooks, needParens?: boolean): string {
-		if(this.name) return(this.name);
-		if(this.ref) {
-			return(hooks && hooks.ref ? hooks.ref(this, hooks) :
-				this.ref.name
-			);
-		}
-		if(this.arrayOf) {
-			return(hooks && hooks.array ? hooks.array(this, hooks) :
-				this.arrayOf.format(hooks, true) + '[]'
-			);
+		var output: string;
+		var hook: FormatHook;
+
+		if(!hooks) hooks = {};
+
+		if(this.name) {
+			hook = hooks.unknown;
+			output = this.name;
 		}
 
-		var output: string;
+		if(this.ref) {
+			output = this.ref.name;
+			if(hooks.ref) output = hooks.ref(this, output, hooks);
+
+			if(this.argumentList) {
+				hook = hooks.generic;
+				output += '<' + this.argumentList.map((spec: TypeSpec) => spec.format(hooks, false)).join(', ') + '>';
+			}
+		}
+
+		if(this.arrayOf) {
+			hook = hooks.array;
+			output = this.arrayOf.format(hooks, true) + '[]';
+		}
+
+		if(output) return(hook ? hook(this, output, hooks) : output);
 
 		if(this.unionOf) {
-			output = hooks && hooks.union ? hooks.union(this, hooks) :
-				this.unionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' | ');
+			hook = hooks.union;
+			output = this.unionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' | ');
 		}
 
 		if(this.intersectionOf) {
-			output = hooks && hooks.intersection ? hooks.intersection(this, hooks) :
-				this.intersectionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' & ');
+			hook = hooks.intersection;
+			output = this.intersectionOf.map((spec: TypeSpec) => spec.format(hooks, true)).join(' & ');
 		}
 
 		if(needParens) output = '(' + output + ')';
 
-		return(output);
+		return(hook ? hook(this, output, hooks) : output);
 	}
 
 	/** Name of the type, only present if not composed of other type or class etc. */
@@ -98,4 +118,6 @@ export class TypeSpec {
 	intersectionOf: TypeSpec[];
 	/** If the type is an array, its element type. */
 	arrayOf: TypeSpec;
+	/** Arguments of a generic type. */
+	argumentList: TypeSpec[];
 }

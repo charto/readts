@@ -60,12 +60,13 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-FormatHooks"></a>
 > ### Interface [`FormatHooks`](#api-FormatHooks)
 > <em>Hooks to change how parts of type definitions are converted to strings.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/e35cb82/src/TypeSpec.ts#L9-L15)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/develop/src/TypeSpec.ts#L9-L16)  
 >  
 > Properties:  
 > > **.ref**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
 > > **.array**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
 > > **.union**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
+> > **.intersection**<sub>?</sub> <sup><code>(spec: TypeSpec, hooks: FormatHooks) => string</code></sup>  
 >
 > <a name="api-FunctionSpec"></a>
 > ### Class [`FunctionSpec`](#api-FunctionSpec)
@@ -163,10 +164,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-TypeSpec"></a>
 > ### Class [`TypeSpec`](#api-TypeSpec)
 > <em>Type definition.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/e35cb82/src/TypeSpec.ts#L19-L80)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/develop/src/TypeSpec.ts#L20-L103)  
 >  
 > Methods:  
-> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/e35cb82/src/TypeSpec.ts#L58-L70)  
+> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/develop/src/TypeSpec.ts#L63-L91)  
 > > &emsp;<em>Convert to string, with optional hooks replacing default formatting code.</em>  
 > > &emsp;&#x25ab; hooks<sub>?</sub> <sup><code>[FormatHooks](#api-FormatHooks)</code></sup>  
 > > &emsp;&#x25ab; needParens<sub>?</sub> <sup><code>boolean</code></sup>  
@@ -178,6 +179,8 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > > &emsp;<em>Definition of what the type points to, if available.</em>  
 > > **.unionOf** <sup><code>[TypeSpec](#api-TypeSpec)[]</code></sup>  
 > > &emsp;<em>If the type is a union, list of the possible types.</em>  
+> > **.intersectionOf** <sup><code>[TypeSpec](#api-TypeSpec)[]</code></sup>  
+> > &emsp;<em>If the type is an intersection, list of the possible types.</em>  
 > > **.arrayOf** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
 > > &emsp;<em>If the type is an array, its element type.</em>  
 

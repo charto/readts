@@ -6,5 +6,5 @@ export {SignatureSpec} from './SignatureSpec';
 export {FunctionSpec} from './FunctionSpec';
 export {ClassSpec} from './ClassSpec';
 export {ModuleSpec} from './ModuleSpec';
-export {TypeSpec, FormatHooks} from './TypeSpec';
+export {TypeSpec, FormatHook, FormatHooks} from './TypeSpec';
 export {Parser, SourcePos, RefSpec} from './Parser';

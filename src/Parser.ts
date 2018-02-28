@@ -3,6 +3,7 @@
 
 import * as ts from 'typescript';
 import * as readts from './readts';
+import * as path from 'path';
 
 export interface SourcePos {
 	sourcePath: string;
@@ -63,7 +64,7 @@ export class Parser {
 			if(
 				!nameFilter ||
 				!extension ||
-				nameFilter((ts as any).getOwnEmitOutputFilePath(source, this.program, extension))
+				nameFilter(this.getOwnEmitOutputFilePath(source, this.program, extension))
 			) {
 				this.parseSource(source);
 			}
@@ -113,13 +114,13 @@ export class Parser {
 	}
 
 	private parseSource(source: ts.SourceFile) {
-		var symbol = (source as any).symbol as ts.Symbol;
+		var symbol = this.checker.getSymbolAtLocation(source);
 		if(!symbol) return;
 
 		var exportTbl = symbol.exports;
 
-		for(var name of Object.keys(exportTbl).sort()) {
-			var spec = this.parseSymbol(exportTbl[name]);
+		for(var name of this.getKeys(exportTbl).sort()) {
+			var spec = this.parseSymbol(exportTbl.get(name));
 
 			// Resolve aliases.
 			while(1) {
@@ -168,7 +169,7 @@ export class Parser {
 	}
 
 	private parseComment(symbol: ts.Symbol | ts.Signature) {
-		return(ts.displayPartsToString(symbol.getDocumentationComment()).trim());
+		return(ts.displayPartsToString(symbol.getDocumentationComment(this.checker)).trim());
 	}
 
 	private parsePos(node: ts.Declaration): SourcePos {
@@ -220,15 +221,13 @@ export class Parser {
 
 		var memberTbl = spec.symbol.members;
 
-		for(var key of Object.keys(memberTbl)) {
-			var spec = this.parseSymbol(memberTbl[key]);
+		for(var key of this.getKeys(memberTbl)) {
+			var spec = this.parseSymbol(memberTbl.get(key));
 
 			if(!spec) continue;
 
 			if(spec.declaration) {
-				var declFlags = spec.declaration.flags;
-
-				if(declFlags & ts.NodeFlags.Private) continue;
+				if(ts.getCombinedModifierFlags(spec.declaration) & ts.ModifierFlags.Private) continue;
 			}
 
 			var symbolFlags = spec.symbol.getFlags();
@@ -282,9 +281,27 @@ export class Parser {
 		return(signatureSpec);
 	}
 
+	private getKeys<T>(map: ts.ReadonlyUnderscoreEscapedMap<T>): ts.__String[] {
+		const keys: ts.__String[] = [];
+		map.forEach((_, key) => keys.push(key));
+		return(keys);
+	}
+
+	private getOwnEmitOutputFilePath(sourceFile: ts.SourceFile, program: ts.Program, extension: string): string {
+		var getCanonicalFileName = (ts as any).createGetCanonicalFileName(ts.sys.useCaseSensitiveFileNames);
+		var host = {
+			getCanonicalFileName,
+			getCommonSourceDirectory: (program as any).getCommonSourceDirectory,
+			getCompilerOptions: program.getCompilerOptions,
+			getCurrentDirectory: program.getCurrentDirectory,
+		};
+		var outPath = (ts as any).getOwnEmitOutputFilePath(sourceFile, host, extension);
+		return(path.resolve(program.getCurrentDirectory(), outPath));
+	}
+
 	private static isNodeExported(node: ts.Node) {
 		return(
-			!!(node.flags & ts.NodeFlags.Export) ||
+			!!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) ||
 			(node.parent && node.parent.kind == ts.SyntaxKind.SourceFile)
 		);
 	}

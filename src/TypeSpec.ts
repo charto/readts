@@ -26,16 +26,17 @@ export class TypeSpec {
 
 	constructor(type: ts.Type, parser: readts.Parser) {
 		var tf = ts.TypeFlags;
+		var oFlags = ts.ObjectFlags;
 
 		// console.log(Object.keys(tf).map((name: string) => type.flags & tf[name] ? name : null).filter((name) => !!name).join(' | '));
 
-		if(type.flags & ((tf as any).Intrinsic | tf.ThisType | tf.Anonymous | tf.StringLiteral)) {
+		if(this.isSimpleType(type)) {
 			this.name = parser.typeToString(type);
-		} else if(type.flags & tf.Reference) {
-			this.parseReference(type as ts.TypeReference, parser);
-		} else if (type.flags & (tf.Class | tf.Interface | tf.Enum | tf.TypeParameter)) {
+		} else if (this.isTypeReference(type)) {
+			this.parseReference(type, parser);
+		} else if (this.isClassLikeType(type)) {
 			this.parseClass(type, parser);
-		} else if (type.flags & tf.Tuple) {
+		} else if (this.isObjectType(type) && (type.objectFlags & oFlags.Tuple)) {
 		} else if (type.flags & tf.Union) {
 			this.unionOf = this.parseList((type as ts.UnionOrIntersectionType).types, parser);
 		} else if (type.flags & tf.Intersection) {
@@ -61,6 +62,32 @@ export class TypeSpec {
 
 	private parseList(typeList: ts.Type[], parser: readts.Parser) {
 		return(typeList.map((type: ts.Type) => new TypeSpec(type, parser)));
+	}
+
+	private isSimpleType(type: ts.Type): boolean {
+		if (!!(type.flags & ((ts.TypeFlags as any).Intrinsic | ts.TypeFlags.StringLiteral))) {
+			return true;
+		}
+		if ((type as any).isThisType) {
+			return true;
+		}
+		if (this.isObjectType(type) && !!(type.objectFlags & ts.ObjectFlags.Anonymous)) {
+			return true;
+		}
+		return false;
+	}
+
+	private isClassLikeType(type: ts.Type): boolean {
+		return !!(type.flags & (ts.TypeFlags.Enum | ts.TypeFlags.TypeParameter))
+			|| (this.isObjectType(type) && !!(type.objectFlags & ts.ObjectFlags.ClassOrInterface));
+	}
+
+	private isObjectType(type: ts.Type): type is ts.ObjectType {
+		return !!(type.flags & ts.TypeFlags.Object);
+	}
+	
+	private isTypeReference(type: ts.Type): type is ts.TypeReference {
+		return this.isObjectType(type) && !!(type.objectFlags & ts.ObjectFlags.Reference);
 	}
 
 	/** Convert to string, with optional hooks replacing default formatting code. */

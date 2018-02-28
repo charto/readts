@@ -1,9 +1,9 @@
 // This file is part of readts, copyright (c) 2016 BusFaster Ltd.
 // Released under the MIT license, see LICENSE.
 
-import * as ts from 'typescript';
-import * as readts from './readts';
 import * as path from 'path';
+import * as ts from 'typescript';
+import * as readts from './index';
 
 export interface SourcePos {
 	sourcePath: string;

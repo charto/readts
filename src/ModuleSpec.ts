@@ -2,7 +2,7 @@
 // Released under the MIT license, see LICENSE.
 
 import * as ts from 'typescript';
-import * as readts from './readts';
+import * as readts from './index';
 
 /** Module or source file. */
 

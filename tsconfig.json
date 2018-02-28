@@ -1,15 +1,17 @@
 {
+	"compileOnSave": true,
 	"compilerOptions": {
 		"declaration": true,
 		"experimentalDecorators": true,
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"noImplicitAny": true,
+		"noImplicitThis": true,
 		"outDir": "dist",
 		"removeComments": false,
 		"target": "es5"
 	},
 	"files": [
-		"src/readts.ts"
+		"src/index.ts"
 	]
 }

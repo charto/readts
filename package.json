@@ -2,13 +2,13 @@
   "name": "readts",
   "version": "0.2.0",
   "description": "TypeScript exported definitions parser",
-  "main": "dist/readts.js",
-  "typings": "dist/readts.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "tsc": "tsc",
     "docts": "docts",
     "prepublish": "tsc",
-    "test": "node dist/readts.js"
+    "test": "node dist/index.js"
   },
   "author": "Juha Järvi",
   "license": "MIT",
@@ -22,7 +22,7 @@
   "homepage": "https://github.com/charto/readts#readme",
   "devDependencies": {
     "@types/node": "^8.9.4",
-    "docts": "~0.1.0"
+    "docts": "~0.2.0"
   },
   "dependencies": {
     "typescript": "^2.7.2"

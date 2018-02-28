@@ -2,7 +2,7 @@
 // Released under the MIT license, see LICENSE.
 
 import * as ts from 'typescript';
-import * as readts from './readts';
+import * as readts from './index';
 
 export type FormatHook = (spec: TypeSpec, output?: string, hooks?: FormatHooks) => string;
 

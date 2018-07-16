@@ -15,6 +15,7 @@ export class ClassSpec {
 		this.name = spec.name;
 		this.pos = spec.pos;
 		this.symbol = spec.symbol;
+        this.exports = new readts.ModuleSpec();
 
 		if(spec.doc) this.doc = spec.doc;
 	}
@@ -54,6 +55,8 @@ export class ClassSpec {
 	methodList: readts.FunctionSpec[];
 	/** Public properties. */
 	propertyList: readts.IdentifierSpec[];
+    /** Class exports */
+    exports: readts.ModuleSpec;
 	/** JSDoc comment. */
 	doc: string;
 }

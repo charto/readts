@@ -221,8 +221,8 @@ export class Parser {
 
 		var memberTbl = spec.symbol.members;
 
-		for(var key of this.getKeys(memberTbl)) {
-			var spec = this.parseSymbol(memberTbl.get(key));
+		for(let key of this.getKeys(memberTbl)) {
+			const spec = this.parseSymbol(memberTbl.get(key));
 
 			if(!spec) continue;
 
@@ -230,7 +230,7 @@ export class Parser {
 				if(ts.getCombinedModifierFlags(spec.declaration) & ts.ModifierFlags.Private) continue;
 			}
 
-			var symbolFlags = spec.symbol.getFlags();
+			const symbolFlags = spec.symbol.getFlags();
 
 			if(symbolFlags & ts.SymbolFlags.Method) {
 				classSpec.addMethod(this.parseFunction(spec));
@@ -238,6 +238,35 @@ export class Parser {
 				classSpec.addProperty(this.parseIdentifier(spec, !!(symbolFlags & ts.SymbolFlags.Optional)));
 			}
 		}
+
+        if ( spec.symbol.getFlags() & ts.SymbolFlags.HasExports )
+        {
+            var exportTbl = spec.symbol.exports;
+
+            for(let key of this.getKeys(exportTbl)) {
+                const symbol = exportTbl.get(key);
+
+                if ( !(symbol.getFlags() & ts.SymbolFlags.ClassMember) )
+                {
+                    const spec = this.parseSymbol(exportTbl.get(key));
+
+                    if(!spec) continue;
+
+                    if(spec.declaration) {
+                        if(ts.getCombinedModifierFlags(spec.declaration) & ts.ModifierFlags.Private) continue;
+                    }
+
+                    const symbolFlags = spec.symbol.getFlags();
+                    const exports = classSpec.exports;
+
+                    if(symbolFlags & ts.SymbolFlags.Class) {
+                        exports.addClass(this.parseClass(spec));
+                    } else if(symbolFlags & ts.SymbolFlags.Interface) {
+                        exports.addInterface(this.parseClass(spec));
+                    }
+                }
+            }
+        }
 
 		return(classSpec);
 	}

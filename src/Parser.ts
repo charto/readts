@@ -153,6 +153,12 @@ export class Parser {
 					if(functionSpec) moduleSpec.addFunction(functionSpec);
 				}
 				break;
+            case ts.SyntaxKind.EnumDeclaration:
+                if (spec) {
+                    var enumSpec = this.parseEnum(spec);
+                    if(enumSpec) moduleSpec.addEnum(enumSpec);
+                }
+                break;
 
 			case ts.SyntaxKind.ClassDeclaration:
 			case ts.SyntaxKind.InterfaceDeclaration:
@@ -207,6 +213,29 @@ export class Parser {
 		return(spec);
 	}
 
+    private parseEnum(spec: SymbolSpec) {
+		var enumSpec = new readts.EnumSpec(spec);
+
+        if ( spec.symbol.getFlags() & ts.SymbolFlags.HasExports )
+        {
+            var exportTbl = spec.symbol.exports;
+
+            for(let key of this.getKeys(exportTbl)) {
+                const symbol = exportTbl.get(key);
+
+                const spec = this.parseSymbol(exportTbl.get(key));
+
+                if(!spec) continue;
+
+                if(spec.symbol.getFlags() & ts.SymbolFlags.EnumMember) {
+                    enumSpec.addMember(this.parseIdentifier(spec, false));
+			    }
+            }
+        }
+
+		return(enumSpec);
+	}
+
 	private parseClass(spec: SymbolSpec) {
 		var classSpec = new readts.ClassSpec(spec);
 
@@ -252,18 +281,7 @@ export class Parser {
 
                     if(!spec) continue;
 
-                    if(spec.declaration) {
-                        if(ts.getCombinedModifierFlags(spec.declaration) & ts.ModifierFlags.Private) continue;
-                    }
-
-                    const symbolFlags = spec.symbol.getFlags();
-                    const exports = classSpec.exports;
-
-                    if(symbolFlags & ts.SymbolFlags.Class) {
-                        exports.addClass(this.parseClass(spec));
-                    } else if(symbolFlags & ts.SymbolFlags.Interface) {
-                        exports.addInterface(this.parseClass(spec));
-                    }
+                    this.parseDeclaration(spec, classSpec.exports);
                 }
             }
         }

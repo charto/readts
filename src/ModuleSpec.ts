@@ -4,6 +4,8 @@
 import * as ts from 'typescript';
 import * as readts from './index';
 
+import { SymbolSpec } from './Parser';
+
 /** Module or source file. */
 
 export class ModuleSpec {

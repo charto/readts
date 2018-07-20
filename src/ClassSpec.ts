@@ -44,6 +44,14 @@ export class ClassSpec {
 		this.propertyList.push(spec);
 	}
 
+    /** Add extend. @ignore internal use. */
+
+	addExtend(spec: readts.ClassSpec) {
+		if(!this.extendList) this.extendList = [];
+
+		this.extendList.push(spec);
+	}
+
 	/** Class name. */
 	name: string;
 	pos: readts.SourcePos;
@@ -55,6 +63,8 @@ export class ClassSpec {
 	methodList: readts.FunctionSpec[];
 	/** Public properties. */
 	propertyList: readts.IdentifierSpec[];
+    /** Class extends */
+    extendList: readts.ClassSpec[];
     /** Class exports */
     exports: readts.ModuleSpec;
 	/** JSDoc comment. */

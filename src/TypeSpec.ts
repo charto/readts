@@ -30,9 +30,13 @@ export class TypeSpec {
 
 		// console.log(Object.keys(tf).map((name: string) => type.flags & tf[name] ? name : null).filter((name) => !!name).join(' | '));
 
-        if(type.flags & ts.TypeFlags.EnumLiteral){
-            this.parseEnum(type);
-		}else if(this.isSimpleType(type)) {
+        if(type.flags & tf.EnumLiteral){
+            if(type.flags & tf.Union) {
+		        this.ref = parser.getRef(type.symbol);
+            } else {
+                this.parseEnum(type);
+            }
+		} else if(this.isSimpleType(type)) {
 			this.name = parser.typeToString(type);
 		} else if (this.isTypeReference(type)) {
 			this.parseReference(type, parser);

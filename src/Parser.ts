@@ -28,6 +28,7 @@ export interface RefSpec {
 	name?: string;
 	symbol?: ts.Symbol;
 	class?: readts.ClassSpec;
+    enum?: readts.EnumSpec;
 }
 
 /** Main parser class with public methods, also holding its internal state. */
@@ -216,6 +217,8 @@ export class Parser {
     private parseEnum(spec: SymbolSpec) {
 		var enumSpec = new readts.EnumSpec(spec);
 
+        this.getRef(spec.symbol, { enum: enumSpec });
+
         if ( spec.symbol.getFlags() & ts.SymbolFlags.HasExports )
         {
             var exportTbl = spec.symbol.exports;
@@ -267,6 +270,24 @@ export class Parser {
 				classSpec.addProperty(this.parseIdentifier(spec, !!(symbolFlags & ts.SymbolFlags.Optional)));
 			}
 		}
+
+        const heritageClauses = (<ts.ClassLikeDeclarationBase>spec.declaration).heritageClauses;
+
+        if(heritageClauses) {
+            for(let heritageClause of heritageClauses) {
+                for(let type of heritageClause.types) {
+                    const symbol = this.checker.getSymbolAtLocation(type.expression);
+
+                    if(symbol && symbol.declarations.length) {
+                        const ref = this.getRef(symbol);
+
+                        if(ref.class) {
+                            classSpec.addExtend(ref.class);
+                        }
+                    }
+                }
+            }
+        }
 
         if ( spec.symbol.getFlags() & ts.SymbolFlags.HasExports )
         {

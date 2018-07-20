@@ -41,10 +41,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-ClassSpec"></a>
 > ### Class [`ClassSpec`](#api-ClassSpec)
 > <em>Class or interface and its members.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/4089498/src/ClassSpec.ts#L11-L62)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/ClassSpec.ts#L11-L72)  
 >  
 > Methods:  
-> > **new( )** <sup>&rArr; <code>[ClassSpec](#api-ClassSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/4089498/src/ClassSpec.ts#L14-L21)  
+> > **new( )** <sup>&rArr; <code>[ClassSpec](#api-ClassSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/master/src/ClassSpec.ts#L14-L21)  
 > > &emsp;&#x25aa; spec <sup><code>SymbolSpec</code></sup>  
 >  
 > Properties:  
@@ -58,6 +58,8 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > > &emsp;<em>Public methods.</em>  
 > > **.propertyList** <sup><code>[IdentifierSpec](#api-IdentifierSpec)[]</code></sup>  
 > > &emsp;<em>Public properties.</em>  
+> > **.extendList** <sup><code>[ClassSpec](#api-ClassSpec)[]</code></sup>  
+> > &emsp;<em>Class extends</em>  
 > > **.exports** <sup><code>[ModuleSpec](#api-ModuleSpec)</code></sup>  
 > > &emsp;<em>Class exports</em>  
 > > **.doc** <sup><code>string</code></sup>  
@@ -87,7 +89,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-FormatHooks"></a>
 > ### Interface [`FormatHooks`](#api-FormatHooks)
 > <em>Hooks to change how parts of type definitions are converted to strings.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/21a4758/src/TypeSpec.ts#L11-L20)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/TypeSpec.ts#L11-L20)  
 >  
 > Properties:  
 > > **.unknown**<sub>?</sub> <sup><code>FormatHook</code></sup>  
@@ -133,10 +135,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-ModuleSpec"></a>
 > ### Class [`ModuleSpec`](#api-ModuleSpec)
 > <em>Module or source file.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/21a4758/src/ModuleSpec.ts#L9-L56)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/ModuleSpec.ts#L11-L58)  
 >  
 > Methods:  
-> > **.isEmpty( )** <sup>&rArr; <code>boolean</code></sup> [`<>`](http://github.com/charto/readts/blob/21a4758/src/ModuleSpec.ts#L36-L44)  
+> > **.isEmpty( )** <sup>&rArr; <code>boolean</code></sup> [`<>`](http://github.com/charto/readts/blob/master/src/ModuleSpec.ts#L38-L46)  
 > > &emsp;<em>Test if nothing is exported.</em>  
 >  
 > Properties:  
@@ -154,13 +156,13 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-Parser"></a>
 > ### Class [`Parser`](#api-Parser)
 > <em>Main parser class with public methods, also holding its internal state.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/21a4758/src/Parser.ts#L35-L363)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/Parser.ts#L36-L384)  
 >  
 > Methods:  
-> > **.parseConfig( )** <sup>&rArr; <code>ParsedCommandLine</code></sup> [`<>`](http://github.com/charto/readts/blob/21a4758/src/Parser.ts#L38-L43)  
+> > **.parseConfig( )** <sup>&rArr; <code>ParsedCommandLine</code></sup> [`<>`](http://github.com/charto/readts/blob/master/src/Parser.ts#L39-L44)  
 > > &emsp;<em>Parse a tsconfig.json file using TypeScript services API.</em>  
 > > &emsp;&#x25aa; tsconfigPath <sup><code>string</code></sup>  
-> > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/21a4758/src/Parser.ts#L47-L74)  
+> > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/master/src/Parser.ts#L48-L75)  
 > > &emsp;<em>Parse a TypeScript project using TypeScript services API and configuration.</em>  
 > > &emsp;&#x25aa; config <sup><code>ParsedCommandLine</code></sup>  
 > > &emsp;&#x25ab; nameFilter<sub>?</sub> <sup><code>(pathName: string) =&gt; boolean</code></sup>  
@@ -168,12 +170,13 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-RefSpec"></a>
 > ### Interface [`RefSpec`](#api-RefSpec)
-> Source code: [`<>`](http://github.com/charto/readts/blob/21a4758/src/Parser.ts#L25-L31)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/Parser.ts#L25-L32)  
 >  
 > Properties:  
 > > **.name**<sub>?</sub> <sup><code>string</code></sup>  
 > > **.symbol**<sub>?</sub> <sup><code>Symbol</code></sup>  
 > > **.class**<sub>?</sub> <sup><code>[ClassSpec](#api-ClassSpec)</code></sup>  
+> > **.enum**<sub>?</sub> <sup><code>[EnumSpec](#api-EnumSpec)</code></sup>  
 >
 > <a name="api-SignatureSpec"></a>
 > ### Class [`SignatureSpec`](#api-SignatureSpec)
@@ -197,7 +200,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-SourcePos"></a>
 > ### Interface [`SourcePos`](#api-SourcePos)
-> Source code: [`<>`](http://github.com/charto/readts/blob/21a4758/src/Parser.ts#L8-L12)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/Parser.ts#L8-L12)  
 >  
 > Properties:  
 > > **.sourcePath** <sup><code>string</code></sup>  
@@ -207,10 +210,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-TypeSpec"></a>
 > ### Class [`TypeSpec`](#api-TypeSpec)
 > <em>Type definition.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/21a4758/src/TypeSpec.ts#L24-L159)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/master/src/TypeSpec.ts#L24-L162)  
 >  
 > Methods:  
-> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/21a4758/src/TypeSpec.ts#L102-L143)  
+> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/master/src/TypeSpec.ts#L105-L146)  
 > > &emsp;<em>Convert to string, with optional hooks replacing default formatting code.</em>  
 > > &emsp;&#x25ab; hooks<sub>?</sub> <sup><code>[FormatHooks](#api-FormatHooks)</code></sup>  
 > > &emsp;&#x25ab; needParens<sub>?</sub> <sup><code>boolean</code></sup>  

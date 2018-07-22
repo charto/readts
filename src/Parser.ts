@@ -196,6 +196,14 @@ export class Parser {
 		// Interfaces have no value declaration.
 		if(!declaration) declaration = symbol.getDeclarations()[0];
 
+		// On merged declaration with enums, valueDeclaration is ModuleDeclaration.
+		if(declaration.kind == ts.SyntaxKind.ModuleDeclaration) {
+			const first = symbol.getDeclarations()[0];
+
+			if(first.kind == ts.SyntaxKind.InterfaceDeclaration)
+				declaration = first;
+		}
+
 		if(declaration) {
 			pos = this.parsePos(declaration);
 			type = this.checker.getTypeOfSymbolAtLocation(symbol, declaration);

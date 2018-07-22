@@ -266,6 +266,8 @@ export class Parser {
 				classSpec.addMethod(this.parseFunction(spec));
 			} else if(symbolFlags & ts.SymbolFlags.Property) {
 				classSpec.addProperty(this.parseIdentifier(spec, !!(symbolFlags & ts.SymbolFlags.Optional)));
+			} else if(ts.isIndexSignatureDeclaration(spec.declaration)) {
+				classSpec.index = this.parseIndex(spec);
 			}
 		}
 
@@ -314,6 +316,18 @@ export class Parser {
 		}
 
 		return(funcSpec);
+	}
+
+	private parseIndex(spec: SymbolSpec) {
+		var declaration = spec.declaration as ts.IndexSignatureDeclaration;
+		var parameter = declaration.parameters[0] as ts.ParameterDeclaration;
+
+		// ParameterDeclaration does have symbol, even though it is not on interfaces.
+		var singatureType = this.parseType(this.checker.getTypeOfSymbolAtLocation((<any>parameter).symbol, parameter.type));
+		var valueType = this.parseType(this.checker.getTypeAtLocation(declaration.type));
+
+		var indexSpec =  new readts.IndexSpec(singatureType, valueType);
+		return(indexSpec);
 	}
 
 	/** Parse property, function / method parameter or variable. */

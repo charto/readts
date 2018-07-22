@@ -59,6 +59,8 @@ export class ClassSpec {
 	symbol: ts.Symbol;
 	/** Constructor function. */
 	construct: readts.FunctionSpec;
+	/** Index signature. */
+	index: readts.IndexSpec;
 	/** Public methods. */
 	methodList: readts.FunctionSpec[];
 	/** Public properties. */

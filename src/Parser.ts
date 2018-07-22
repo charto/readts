@@ -28,7 +28,7 @@ export interface RefSpec {
 	name?: string;
 	symbol?: ts.Symbol;
 	class?: readts.ClassSpec;
-    enum?: readts.EnumSpec;
+	enum?: readts.EnumSpec;
 }
 
 /** Main parser class with public methods, also holding its internal state. */
@@ -154,13 +154,12 @@ export class Parser {
 					if(functionSpec) moduleSpec.addFunction(functionSpec);
 				}
 				break;
-            case ts.SyntaxKind.EnumDeclaration:
-                if (spec) {
-                    var enumSpec = this.parseEnum(spec);
-                    if(enumSpec) moduleSpec.addEnum(enumSpec);
-                }
-                break;
-
+			case ts.SyntaxKind.EnumDeclaration:
+				if (spec) {
+					var enumSpec = this.parseEnum(spec);
+					if(enumSpec) moduleSpec.addEnum(enumSpec);
+				}
+				break;
 			case ts.SyntaxKind.ClassDeclaration:
 			case ts.SyntaxKind.InterfaceDeclaration:
 				if(spec) {
@@ -214,27 +213,26 @@ export class Parser {
 		return(spec);
 	}
 
-    private parseEnum(spec: SymbolSpec) {
+	private parseEnum(spec: SymbolSpec) {
 		var enumSpec = new readts.EnumSpec(spec);
 
-        this.getRef(spec.symbol, { enum: enumSpec });
+		this.getRef(spec.symbol, { enum: enumSpec });
 
-        if ( spec.symbol.getFlags() & ts.SymbolFlags.HasExports )
-        {
-            var exportTbl = spec.symbol.exports;
+		if(spec.symbol.getFlags() & ts.SymbolFlags.HasExports) {
+			var exportTbl = spec.symbol.exports;
 
-            for(let key of this.getKeys(exportTbl)) {
-                const symbol = exportTbl.get(key);
+			for(let key of this.getKeys(exportTbl)) {
+				const symbol = exportTbl.get(key);
 
-                const spec = this.parseSymbol(exportTbl.get(key));
+				const spec = this.parseSymbol(exportTbl.get(key));
 
-                if(!spec) continue;
+				if(!spec) continue;
 
-                if(spec.symbol.getFlags() & ts.SymbolFlags.EnumMember) {
-                    enumSpec.addMember(this.parseIdentifier(spec, false));
-			    }
-            }
-        }
+				if(spec.symbol.getFlags() & ts.SymbolFlags.EnumMember) {
+					enumSpec.addMember(this.parseIdentifier(spec, false));
+				}
+			}
+		}
 
 		return(enumSpec);
 	}
@@ -271,41 +269,39 @@ export class Parser {
 			}
 		}
 
-        const heritageClauses = (<ts.ClassLikeDeclarationBase>spec.declaration).heritageClauses;
+		const heritageClauses = (<ts.ClassLikeDeclarationBase>spec.declaration).heritageClauses;
 
-        if(heritageClauses) {
-            for(let heritageClause of heritageClauses) {
-                for(let type of heritageClause.types) {
-                    const symbol = this.checker.getSymbolAtLocation(type.expression);
+		if(heritageClauses) {
+			for(let heritageClause of heritageClauses) {
+				for(let type of heritageClause.types) {
+					const symbol = this.checker.getSymbolAtLocation(type.expression);
 
-                    if(symbol && symbol.declarations.length) {
-                        const ref = this.getRef(symbol);
+					if(symbol && symbol.declarations.length) {
+						const ref = this.getRef(symbol);
 
-                        if(ref.class) {
-                            classSpec.addExtend(ref.class);
-                        }
-                    }
-                }
-            }
-        }
+						if(ref.class) {
+							classSpec.addExtend(ref.class);
+						}
+					}
+				}
+			}
+		}
 
-        if ( spec.symbol.getFlags() & ts.SymbolFlags.HasExports )
-        {
-            var exportTbl = spec.symbol.exports;
+		if(spec.symbol.getFlags() & ts.SymbolFlags.HasExports) {
+			var exportTbl = spec.symbol.exports;
 
-            for(let key of this.getKeys(exportTbl)) {
-                const symbol = exportTbl.get(key);
+			for(let key of this.getKeys(exportTbl)) {
+				const symbol = exportTbl.get(key);
 
-                if ( !(symbol.getFlags() & ts.SymbolFlags.ClassMember) )
-                {
-                    const spec = this.parseSymbol(exportTbl.get(key));
+				if(!(symbol.getFlags() & ts.SymbolFlags.ClassMember)) {
+					const spec = this.parseSymbol(exportTbl.get(key));
 
-                    if(!spec) continue;
+					if(!spec) continue;
 
-                    this.parseDeclaration(spec, classSpec.exports);
-                }
-            }
-        }
+					this.parseDeclaration(spec, classSpec.exports);
+				}
+			}
+		}
 
 		return(classSpec);
 	}

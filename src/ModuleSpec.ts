@@ -37,7 +37,7 @@ export class ModuleSpec {
 
 	isEmpty() {
 		return(
-            !this.enumList.length &&
+			!this.enumList.length &&
 			!this.classList.length &&
 			!this.interfaceList.length &&
 			!this.functionList.length &&
@@ -45,7 +45,7 @@ export class ModuleSpec {
 		);
 	}
 
-    /** Definitions of exported enums. */
+	/** Definitions of exported enums. */
 	enumList: readts.EnumSpec[] = [];
 	/** Definitions of exported classes. */
 	classList: readts.ClassSpec[] = [];

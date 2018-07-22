@@ -9,29 +9,29 @@ import { SymbolSpec } from './Parser';
 /** Enum and its members. */
 
 export class EnumSpec {
-    /** @ignore internal use. */
+	/** @ignore internal use. */
 
-    constructor(spec: SymbolSpec) {
-        this.name = spec.name;
-        this.pos = spec.pos;
-        this.symbol = spec.symbol;
+	constructor(spec: SymbolSpec) {
+		this.name = spec.name;
+		this.pos = spec.pos;
+		this.symbol = spec.symbol;
 
-        if(spec.doc) this.doc = spec.doc;
-    }
+		if(spec.doc) this.doc = spec.doc;
+	}
 
-    addMember(spec: readts.IdentifierSpec) {
-        if(!this.memberList) this.memberList = [];
+	addMember(spec: readts.IdentifierSpec) {
+		if(!this.memberList) this.memberList = [];
 
-        this.memberList.push(spec);
-    }
+		this.memberList.push(spec);
+	}
 
-    /** Class name. */
-    name: string;
-    pos: readts.SourcePos;
-    /** Symbol from TypeScript services. @ignore internal use. */
-    symbol: ts.Symbol;
-    /** Public properties. */
-    memberList: readts.IdentifierSpec[];
-    /** JSDoc comment. */
-    doc: string;
+	/** Class name. */
+	name: string;
+	pos: readts.SourcePos;
+	/** Symbol from TypeScript services. @ignore internal use. */
+	symbol: ts.Symbol;
+	/** Public properties. */
+	memberList: readts.IdentifierSpec[];
+	/** JSDoc comment. */
+	doc: string;
 }

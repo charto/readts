@@ -28,6 +28,7 @@ export interface RefSpec {
 	name?: string;
 	symbol?: ts.Symbol;
 	class?: readts.ClassSpec;
+	enum?: readts.EnumSpec;
 }
 
 /** Main parser class with public methods, also holding its internal state. */
@@ -153,7 +154,12 @@ export class Parser {
 					if(functionSpec) moduleSpec.addFunction(functionSpec);
 				}
 				break;
-
+			case ts.SyntaxKind.EnumDeclaration:
+				if (spec) {
+					var enumSpec = this.parseEnum(spec);
+					if(enumSpec) moduleSpec.addEnum(enumSpec);
+				}
+				break;
 			case ts.SyntaxKind.ClassDeclaration:
 			case ts.SyntaxKind.InterfaceDeclaration:
 				if(spec) {
@@ -190,6 +196,14 @@ export class Parser {
 		// Interfaces have no value declaration.
 		if(!declaration) declaration = symbol.getDeclarations()[0];
 
+		// On merged declaration with enums, valueDeclaration is ModuleDeclaration.
+		if(declaration.kind == ts.SyntaxKind.ModuleDeclaration) {
+			const first = symbol.getDeclarations()[0];
+
+			if(first.kind == ts.SyntaxKind.InterfaceDeclaration)
+				declaration = first;
+		}
+
 		if(declaration) {
 			pos = this.parsePos(declaration);
 			type = this.checker.getTypeOfSymbolAtLocation(symbol, declaration);
@@ -207,6 +221,30 @@ export class Parser {
 		return(spec);
 	}
 
+	private parseEnum(spec: SymbolSpec) {
+		var enumSpec = new readts.EnumSpec(spec);
+
+		this.getRef(spec.symbol, { enum: enumSpec });
+
+		if(spec.symbol.getFlags() & ts.SymbolFlags.HasExports) {
+			var exportTbl = spec.symbol.exports;
+
+			for(let key of this.getKeys(exportTbl)) {
+				const symbol = exportTbl.get(key);
+
+				const spec = this.parseSymbol(exportTbl.get(key));
+
+				if(!spec) continue;
+
+				if(spec.symbol.getFlags() & ts.SymbolFlags.EnumMember) {
+					enumSpec.addMember(this.parseIdentifier(spec, false));
+				}
+			}
+		}
+
+		return(enumSpec);
+	}
+
 	private parseClass(spec: SymbolSpec) {
 		var classSpec = new readts.ClassSpec(spec);
 
@@ -221,8 +259,8 @@ export class Parser {
 
 		var memberTbl = spec.symbol.members;
 
-		for(var key of this.getKeys(memberTbl)) {
-			var spec = this.parseSymbol(memberTbl.get(key));
+		for(let key of this.getKeys(memberTbl)) {
+			const spec = this.parseSymbol(memberTbl.get(key));
 
 			if(!spec) continue;
 
@@ -230,12 +268,48 @@ export class Parser {
 				if(ts.getCombinedModifierFlags(spec.declaration) & ts.ModifierFlags.Private) continue;
 			}
 
-			var symbolFlags = spec.symbol.getFlags();
+			const symbolFlags = spec.symbol.getFlags();
 
 			if(symbolFlags & ts.SymbolFlags.Method) {
 				classSpec.addMethod(this.parseFunction(spec));
 			} else if(symbolFlags & ts.SymbolFlags.Property) {
 				classSpec.addProperty(this.parseIdentifier(spec, !!(symbolFlags & ts.SymbolFlags.Optional)));
+			} else if(ts.isIndexSignatureDeclaration(spec.declaration)) {
+				classSpec.index = this.parseIndex(spec);
+			}
+		}
+
+		const heritageClauses = (<ts.ClassLikeDeclarationBase>spec.declaration).heritageClauses;
+
+		if(heritageClauses) {
+			for(let heritageClause of heritageClauses) {
+				for(let type of heritageClause.types) {
+					const symbol = this.checker.getSymbolAtLocation(type.expression);
+
+					if(symbol && symbol.declarations.length) {
+						const ref = this.getRef(symbol);
+
+						if(ref.class) {
+							classSpec.addExtend(ref.class);
+						}
+					}
+				}
+			}
+		}
+
+		if(spec.symbol.getFlags() & ts.SymbolFlags.HasExports) {
+			var exportTbl = spec.symbol.exports;
+
+			for(let key of this.getKeys(exportTbl)) {
+				const symbol = exportTbl.get(key);
+
+				if(!(symbol.getFlags() & ts.SymbolFlags.ClassMember)) {
+					const spec = this.parseSymbol(exportTbl.get(key));
+
+					if(!spec) continue;
+
+					this.parseDeclaration(spec, classSpec.exports);
+				}
 			}
 		}
 
@@ -250,6 +324,18 @@ export class Parser {
 		}
 
 		return(funcSpec);
+	}
+
+	private parseIndex(spec: SymbolSpec) {
+		var declaration = spec.declaration as ts.IndexSignatureDeclaration;
+		var parameter = declaration.parameters[0] as ts.ParameterDeclaration;
+
+		// ParameterDeclaration does have symbol, even though it is not on interfaces.
+		var singatureType = this.parseType(this.checker.getTypeOfSymbolAtLocation((<any>parameter).symbol, parameter.type));
+		var valueType = this.parseType(this.checker.getTypeAtLocation(declaration.type));
+
+		var indexSpec =  new readts.IndexSpec(singatureType, valueType);
+		return(indexSpec);
 	}
 
 	/** Parse property, function / method parameter or variable. */

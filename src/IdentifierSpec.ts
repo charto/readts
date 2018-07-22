@@ -14,6 +14,7 @@ export class IdentifierSpec {
 	constructor(spec: SymbolSpec, type: readts.TypeSpec, optional: boolean) {
 		this.name = spec.name;
 		this.type = type;
+		this.value = type.value;
 		this.optional = optional;
 		this.pos = spec.pos;
 		if(spec.doc) this.doc = spec.doc;
@@ -24,6 +25,8 @@ export class IdentifierSpec {
 	pos: readts.SourcePos;
 	/** Type definition. */
 	type: readts.TypeSpec;
+	/** Literal type value */
+	value?: any;
 	/** Interface members and function / method parameters may be optional. */
 	optional: boolean;
 	/** JSDoc comment. */

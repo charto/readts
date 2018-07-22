@@ -41,10 +41,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-ClassSpec"></a>
 > ### Class [`ClassSpec`](#api-ClassSpec)
 > <em>Class or interface and its members.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/ClassSpec.ts#L11-L72)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/62754ee/src/ClassSpec.ts#L11-L74)  
 >  
 > Methods:  
-> > **new( )** <sup>&rArr; <code>[ClassSpec](#api-ClassSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/ClassSpec.ts#L14-L21)  
+> > **new( )** <sup>&rArr; <code>[ClassSpec](#api-ClassSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/62754ee/src/ClassSpec.ts#L14-L21)  
 > > &emsp;&#x25aa; spec <sup><code>SymbolSpec</code></sup>  
 >  
 > Properties:  
@@ -54,6 +54,8 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 
 > > **.construct** <sup><code>[FunctionSpec](#api-FunctionSpec)</code></sup>  
 > > &emsp;<em>Constructor function.</em>  
+> > **.index** <sup><code>[IndexSpec](#api-IndexSpec)</code></sup>  
+> > &emsp;<em>Index signature.</em>  
 > > **.methodList** <sup><code>[FunctionSpec](#api-FunctionSpec)[]</code></sup>  
 > > &emsp;<em>Public methods.</em>  
 > > **.propertyList** <sup><code>[IdentifierSpec](#api-IdentifierSpec)[]</code></sup>  
@@ -132,6 +134,17 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > > **.doc** <sup><code>string</code></sup>  
 > > &emsp;<em>JSDoc comment.</em>  
 >
+> <a name="api-IndexSpec"></a>
+> ### Class [`IndexSpec`](#api-IndexSpec)
+> <em>Index signature.</em>  
+> Source code: [`<>`](http://github.com/charto/readts/blob/62754ee/src/IndexSpec.ts#L9-L21)  
+>  
+> Properties:  
+> > **.signature** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
+> > &emsp;<em>Singature type.</em>  
+> > **.value** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
+> > &emsp;<em>Value type</em>  
+>
 > <a name="api-ModuleSpec"></a>
 > ### Class [`ModuleSpec`](#api-ModuleSpec)
 > <em>Module or source file.</em>  
@@ -156,13 +169,13 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-Parser"></a>
 > ### Class [`Parser`](#api-Parser)
 > <em>Main parser class with public methods, also holding its internal state.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/Parser.ts#L36-L380)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L36-L402)  
 >  
 > Methods:  
-> > **.parseConfig( )** <sup>&rArr; <code>ParsedCommandLine</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/Parser.ts#L39-L44)  
+> > **.parseConfig( )** <sup>&rArr; <code>ParsedCommandLine</code></sup> [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L39-L44)  
 > > &emsp;<em>Parse a tsconfig.json file using TypeScript services API.</em>  
 > > &emsp;&#x25aa; tsconfigPath <sup><code>string</code></sup>  
-> > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/Parser.ts#L48-L75)  
+> > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L48-L75)  
 > > &emsp;<em>Parse a TypeScript project using TypeScript services API and configuration.</em>  
 > > &emsp;&#x25aa; config <sup><code>ParsedCommandLine</code></sup>  
 > > &emsp;&#x25ab; nameFilter<sub>?</sub> <sup><code>(pathName: string) =&gt; boolean</code></sup>  
@@ -170,7 +183,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-RefSpec"></a>
 > ### Interface [`RefSpec`](#api-RefSpec)
-> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/Parser.ts#L25-L32)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L25-L32)  
 >  
 > Properties:  
 > > **.name**<sub>?</sub> <sup><code>string</code></sup>  
@@ -200,7 +213,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-SourcePos"></a>
 > ### Interface [`SourcePos`](#api-SourcePos)
-> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/Parser.ts#L8-L12)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L8-L12)  
 >  
 > Properties:  
 > > **.sourcePath** <sup><code>string</code></sup>  

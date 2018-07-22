@@ -41,10 +41,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-ClassSpec"></a>
 > ### Class [`ClassSpec`](#api-ClassSpec)
 > <em>Class or interface and its members.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/ClassSpec.ts#L11-L59)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/62754ee/src/ClassSpec.ts#L11-L74)  
 >  
 > Methods:  
-> > **new( )** <sup>&rArr; <code>[ClassSpec](#api-ClassSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/ClassSpec.ts#L14-L20)  
+> > **new( )** <sup>&rArr; <code>[ClassSpec](#api-ClassSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/62754ee/src/ClassSpec.ts#L14-L21)  
 > > &emsp;&#x25aa; spec <sup><code>SymbolSpec</code></sup>  
 >  
 > Properties:  
@@ -54,9 +54,36 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 
 > > **.construct** <sup><code>[FunctionSpec](#api-FunctionSpec)</code></sup>  
 > > &emsp;<em>Constructor function.</em>  
+> > **.index** <sup><code>[IndexSpec](#api-IndexSpec)</code></sup>  
+> > &emsp;<em>Index signature.</em>  
 > > **.methodList** <sup><code>[FunctionSpec](#api-FunctionSpec)[]</code></sup>  
 > > &emsp;<em>Public methods.</em>  
 > > **.propertyList** <sup><code>[IdentifierSpec](#api-IdentifierSpec)[]</code></sup>  
+> > &emsp;<em>Public properties.</em>  
+> > **.extendList** <sup><code>[ClassSpec](#api-ClassSpec)[]</code></sup>  
+> > &emsp;<em>Class extends</em>  
+> > **.exports** <sup><code>[ModuleSpec](#api-ModuleSpec)</code></sup>  
+> > &emsp;<em>Class exports</em>  
+> > **.doc** <sup><code>string</code></sup>  
+> > &emsp;<em>JSDoc comment.</em>  
+>
+> <a name="api-EnumSpec"></a>
+> ### Class [`EnumSpec`](#api-EnumSpec)
+> <em>Enum and its members.</em>  
+> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/EnumSpec.ts#L11-L37)  
+>  
+> Methods:  
+> > **new( )** <sup>&rArr; <code>[EnumSpec](#api-EnumSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/EnumSpec.ts#L14-L20)  
+> > &emsp;&#x25aa; spec <sup><code>SymbolSpec</code></sup>  
+> > **.addMember( )** <sup>&rArr; <code>void</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/EnumSpec.ts#L22-L26)  
+> > &emsp;&#x25aa; spec <sup><code>[IdentifierSpec](#api-IdentifierSpec)</code></sup>  
+>  
+> Properties:  
+> > **.name** <sup><code>string</code></sup>  
+> > &emsp;<em>Class name.</em>  
+> > **.pos** <sup><code>[SourcePos](#api-SourcePos)</code></sup>  
+
+> > **.memberList** <sup><code>[IdentifierSpec](#api-IdentifierSpec)[]</code></sup>  
 > > &emsp;<em>Public properties.</em>  
 > > **.doc** <sup><code>string</code></sup>  
 > > &emsp;<em>JSDoc comment.</em>  
@@ -64,7 +91,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-FormatHooks"></a>
 > ### Interface [`FormatHooks`](#api-FormatHooks)
 > <em>Hooks to change how parts of type definitions are converted to strings.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/TypeSpec.ts#L11-L20)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/TypeSpec.ts#L11-L20)  
 >  
 > Properties:  
 > > **.unknown**<sub>?</sub> <sup><code>FormatHook</code></sup>  
@@ -77,10 +104,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-FunctionSpec"></a>
 > ### Class [`FunctionSpec`](#api-FunctionSpec)
 > <em>Function or method with any number of overloaded signatures.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/FunctionSpec.ts#L11-L30)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/c857e04/src/FunctionSpec.ts#L11-L30)  
 >  
 > Methods:  
-> > **new( )** <sup>&rArr; <code>[FunctionSpec](#api-FunctionSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/FunctionSpec.ts#L14-L18)  
+> > **new( )** <sup>&rArr; <code>[FunctionSpec](#api-FunctionSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/c857e04/src/FunctionSpec.ts#L14-L18)  
 > > &emsp;&#x25aa; spec <sup><code>SymbolSpec</code></sup>  
 >  
 > Properties:  
@@ -92,7 +119,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-IdentifierSpec"></a>
 > ### Class [`IdentifierSpec`](#api-IdentifierSpec)
 > <em>Property, function / method parameter or variable.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/IdentifierSpec.ts#L11-L31)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/IdentifierSpec.ts#L11-L34)  
 >  
 > Properties:  
 > > **.name** <sup><code>string</code></sup>  
@@ -100,21 +127,36 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > > **.pos** <sup><code>[SourcePos](#api-SourcePos)</code></sup>  
 > > **.type** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
 > > &emsp;<em>Type definition.</em>  
+> > **.value**<sub>?</sub> <sup><code>any</code></sup>  
+> > &emsp;<em>Literal type value</em>  
 > > **.optional** <sup><code>boolean</code></sup>  
 > > &emsp;<em>Interface members and function / method parameters may be optional.</em>  
 > > **.doc** <sup><code>string</code></sup>  
 > > &emsp;<em>JSDoc comment.</em>  
 >
+> <a name="api-IndexSpec"></a>
+> ### Class [`IndexSpec`](#api-IndexSpec)
+> <em>Index signature.</em>  
+> Source code: [`<>`](http://github.com/charto/readts/blob/62754ee/src/IndexSpec.ts#L9-L21)  
+>  
+> Properties:  
+> > **.signature** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
+> > &emsp;<em>Singature type.</em>  
+> > **.value** <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
+> > &emsp;<em>Value type</em>  
+>
 > <a name="api-ModuleSpec"></a>
 > ### Class [`ModuleSpec`](#api-ModuleSpec)
 > <em>Module or source file.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/ModuleSpec.ts#L9-L47)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/ModuleSpec.ts#L11-L58)  
 >  
 > Methods:  
-> > **.isEmpty( )** <sup>&rArr; <code>boolean</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/ModuleSpec.ts#L30-L37)  
+> > **.isEmpty( )** <sup>&rArr; <code>boolean</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/ModuleSpec.ts#L38-L46)  
 > > &emsp;<em>Test if nothing is exported.</em>  
 >  
 > Properties:  
+> > **.enumList** <sup><code>[EnumSpec](#api-EnumSpec)[]</code></sup>  
+> > &emsp;<em>Definitions of exported enums.</em>  
 > > **.classList** <sup><code>[ClassSpec](#api-ClassSpec)[]</code></sup>  
 > > &emsp;<em>Definitions of exported classes.</em>  
 > > **.interfaceList** <sup><code>[ClassSpec](#api-ClassSpec)[]</code></sup>  
@@ -127,13 +169,13 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-Parser"></a>
 > ### Class [`Parser`](#api-Parser)
 > <em>Main parser class with public methods, also holding its internal state.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/Parser.ts#L35-L316)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L36-L402)  
 >  
 > Methods:  
-> > **.parseConfig( )** <sup>&rArr; <code>ParsedCommandLine</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/Parser.ts#L38-L43)  
+> > **.parseConfig( )** <sup>&rArr; <code>ParsedCommandLine</code></sup> [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L39-L44)  
 > > &emsp;<em>Parse a tsconfig.json file using TypeScript services API.</em>  
 > > &emsp;&#x25aa; tsconfigPath <sup><code>string</code></sup>  
-> > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/Parser.ts#L47-L74)  
+> > **.parse( )** <sup>&rArr; <code>[ModuleSpec](#api-ModuleSpec)[]</code></sup> [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L48-L75)  
 > > &emsp;<em>Parse a TypeScript project using TypeScript services API and configuration.</em>  
 > > &emsp;&#x25aa; config <sup><code>ParsedCommandLine</code></sup>  
 > > &emsp;&#x25ab; nameFilter<sub>?</sub> <sup><code>(pathName: string) =&gt; boolean</code></sup>  
@@ -141,20 +183,21 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-RefSpec"></a>
 > ### Interface [`RefSpec`](#api-RefSpec)
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/Parser.ts#L25-L31)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L25-L32)  
 >  
 > Properties:  
 > > **.name**<sub>?</sub> <sup><code>string</code></sup>  
 > > **.symbol**<sub>?</sub> <sup><code>Symbol</code></sup>  
 > > **.class**<sub>?</sub> <sup><code>[ClassSpec](#api-ClassSpec)</code></sup>  
+> > **.enum**<sub>?</sub> <sup><code>[EnumSpec](#api-EnumSpec)</code></sup>  
 >
 > <a name="api-SignatureSpec"></a>
 > ### Class [`SignatureSpec`](#api-SignatureSpec)
 > <em>Function or method signature defining input and output types.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/SignatureSpec.ts#L11-L33)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/c857e04/src/SignatureSpec.ts#L11-L33)  
 >  
 > Methods:  
-> > **new( )** <sup>&rArr; <code>[SignatureSpec](#api-SignatureSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/SignatureSpec.ts#L14-L18)  
+> > **new( )** <sup>&rArr; <code>[SignatureSpec](#api-SignatureSpec)</code></sup> [`<>`](http://github.com/charto/readts/blob/c857e04/src/SignatureSpec.ts#L14-L18)  
 > > &emsp;&#x25aa; pos <sup><code>[SourcePos](#api-SourcePos)</code></sup>  
 > > &emsp;&#x25aa; returnType <sup><code>[TypeSpec](#api-TypeSpec)</code></sup>  
 > > &emsp;&#x25aa; doc <sup><code>string</code></sup>  
@@ -170,7 +213,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-SourcePos"></a>
 > ### Interface [`SourcePos`](#api-SourcePos)
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/Parser.ts#L8-L12)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/f0d51fd/src/Parser.ts#L8-L12)  
 >  
 > Properties:  
 > > **.sourcePath** <sup><code>string</code></sup>  
@@ -180,10 +223,10 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-TypeSpec"></a>
 > ### Class [`TypeSpec`](#api-TypeSpec)
 > <em>Type definition.</em>  
-> Source code: [`<>`](http://github.com/charto/readts/blob/ed8b215/src/TypeSpec.ts#L24-L150)  
+> Source code: [`<>`](http://github.com/charto/readts/blob/ce93baf/src/TypeSpec.ts#L24-L163)  
 >  
 > Methods:  
-> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/ed8b215/src/TypeSpec.ts#L95-L136)  
+> > **.format( )** <sup>&rArr; <code>string</code></sup> [`<>`](http://github.com/charto/readts/blob/ce93baf/src/TypeSpec.ts#L106-L147)  
 > > &emsp;<em>Convert to string, with optional hooks replacing default formatting code.</em>  
 > > &emsp;&#x25ab; hooks<sub>?</sub> <sup><code>[FormatHooks](#api-FormatHooks)</code></sup>  
 > > &emsp;&#x25ab; needParens<sub>?</sub> <sup><code>boolean</code></sup>  
@@ -191,6 +234,8 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > Properties:  
 > > **.name** <sup><code>string</code></sup>  
 > > &emsp;<em>Name of the type, only present if not composed of other type or class etc.</em>  
+> > **.value**<sub>?</sub> <sup><code>string | number</code></sup>  
+> > &emsp;<em>Value of the type, only present if literal type</em>  
 > > **.ref** <sup><code>[RefSpec](#api-RefSpec)</code></sup>  
 > > &emsp;<em>Definition of what the type points to, if available.</em>  
 > > **.unionOf** <sup><code>[TypeSpec](#api-TypeSpec)[]</code></sup>  

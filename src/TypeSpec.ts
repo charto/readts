@@ -30,7 +30,13 @@ export class TypeSpec {
 
 		// console.log(Object.keys(tf).map((name: string) => type.flags & tf[name] ? name : null).filter((name) => !!name).join(' | '));
 
-		if(this.isSimpleType(type)) {
+		if(type.flags & tf.EnumLiteral){
+			if(type.flags & tf.Union) {
+				this.ref = parser.getRef(type.symbol);
+			} else {
+				this.parseEnum(type);
+			}
+		} else if(this.isSimpleType(type)) {
 			this.name = parser.typeToString(type);
 		} else if (this.isTypeReference(type)) {
 			this.parseReference(type, parser);
@@ -42,6 +48,11 @@ export class TypeSpec {
 		} else if (type.flags & tf.Intersection) {
 			this.intersectionOf = this.parseList((type as ts.UnionOrIntersectionType).types, parser);
 		}
+	}
+
+	private parseEnum(type: ts.Type) {
+		this.name = type.flags & ts.TypeFlags.NumberLiteral ? 'number' : 'string';
+		this.value = (<ts.LiteralType>type).value;
 	}
 
 	private parseClass(type: ts.Type, parser: readts.Parser) {
@@ -85,7 +96,7 @@ export class TypeSpec {
 	private isObjectType(type: ts.Type): type is ts.ObjectType {
 		return !!(type.flags & ts.TypeFlags.Object);
 	}
-	
+
 	private isTypeReference(type: ts.Type): type is ts.TypeReference {
 		return this.isObjectType(type) && !!(type.objectFlags & ts.ObjectFlags.Reference);
 	}
@@ -137,6 +148,8 @@ export class TypeSpec {
 
 	/** Name of the type, only present if not composed of other type or class etc. */
 	name: string;
+	/** Value of the type, only present if literal type */
+	value?: string | number;
 	/** Definition of what the type points to, if available. */
 	ref: readts.RefSpec;
 	/** If the type is a union, list of the possible types. */

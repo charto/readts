@@ -15,6 +15,7 @@ export class ClassSpec {
 		this.name = spec.name;
 		this.pos = spec.pos;
 		this.symbol = spec.symbol;
+		this.exports = new readts.ModuleSpec();
 
 		if(spec.doc) this.doc = spec.doc;
 	}
@@ -43,6 +44,14 @@ export class ClassSpec {
 		this.propertyList.push(spec);
 	}
 
+	 /** Add extend. @ignore internal use. */
+
+	addExtend(spec: readts.ClassSpec) {
+		if(!this.extendList) this.extendList = [];
+
+		this.extendList.push(spec);
+	}
+
 	/** Class name. */
 	name: string;
 	pos: readts.SourcePos;
@@ -50,10 +59,16 @@ export class ClassSpec {
 	symbol: ts.Symbol;
 	/** Constructor function. */
 	construct: readts.FunctionSpec;
+	/** Index signature. */
+	index: readts.IndexSpec;
 	/** Public methods. */
 	methodList: readts.FunctionSpec[];
 	/** Public properties. */
 	propertyList: readts.IdentifierSpec[];
+	/** Class extends */
+	extendList: readts.ClassSpec[];
+	/** Class exports */
+	exports: readts.ModuleSpec;
 	/** JSDoc comment. */
 	doc: string;
 }

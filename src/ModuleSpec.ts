@@ -4,9 +4,17 @@
 import * as ts from 'typescript';
 import * as readts from './index';
 
+import { SymbolSpec } from './Parser';
+
 /** Module or source file. */
 
 export class ModuleSpec {
+	/** Add an exported enum. @ignore internal use. */
+
+	addEnum(spec: readts.EnumSpec) {
+		this.enumList.push(spec);
+	}
+
 	/** Add an exported class. @ignore internal use. */
 
 	addClass(spec: readts.ClassSpec) {
@@ -29,6 +37,7 @@ export class ModuleSpec {
 
 	isEmpty() {
 		return(
+			!this.enumList.length &&
 			!this.classList.length &&
 			!this.interfaceList.length &&
 			!this.functionList.length &&
@@ -36,6 +45,8 @@ export class ModuleSpec {
 		);
 	}
 
+	/** Definitions of exported enums. */
+	enumList: readts.EnumSpec[] = [];
 	/** Definitions of exported classes. */
 	classList: readts.ClassSpec[] = [];
 	/** Definitions of exported interfaces. */

@@ -5,6 +5,8 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import * as readts from './index';
 
+const hasExports = (ts.SymbolFlags.Class | ts.SymbolFlags.Enum | ts.SymbolFlags.Module | ts.SymbolFlags.Variable);
+
 export interface SourcePos {
 	sourcePath: string;
 	firstLine: number;
@@ -226,7 +228,7 @@ export class Parser {
 
 		this.getRef(spec.symbol, { enum: enumSpec });
 
-		if(spec.symbol.getFlags() & ts.SymbolFlags.HasExports) {
+		if(spec.symbol.getFlags() & hasExports) {
 			var exportTbl = spec.symbol.exports;
 
 			for(let key of this.getKeys(exportTbl)) {
@@ -297,7 +299,7 @@ export class Parser {
 			}
 		}
 
-		if(spec.symbol.getFlags() & ts.SymbolFlags.HasExports) {
+		if(spec.symbol.getFlags() & hasExports) {
 			var exportTbl = spec.symbol.exports;
 
 			for(let key of this.getKeys(exportTbl)) {
@@ -381,15 +383,11 @@ export class Parser {
 			getCompilerOptions: program.getCompilerOptions,
 			getCurrentDirectory: program.getCurrentDirectory,
 		};
-		var outPath = (ts as any).getOwnEmitOutputFilePath(sourceFile, host, extension);
-		return(path.resolve(program.getCurrentDirectory(), outPath));
-	}
+		const shim = new String(sourceFile.fileName || sourceFile);
+		(shim as any).fileName = shim;
 
-	private static isNodeExported(node: ts.Node) {
-		return(
-			!!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) ||
-			(node.parent && node.parent.kind == ts.SyntaxKind.SourceFile)
-		);
+		var outPath = (ts as any).getOwnEmitOutputFilePath(shim, host, extension);
+		return(path.resolve(program.getCurrentDirectory(), outPath));
 	}
 
 	/** TypeScript services API object. */

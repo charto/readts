@@ -56,14 +56,14 @@ export class TypeSpec {
 	}
 
 	private parseClass(type: ts.Type, parser: readts.Parser) {
-		this.ref = parser.getRef(type.symbol);
+		if(type.symbol) this.ref = parser.getRef(type.symbol);
 	}
 
 	private parseReference(type: ts.TypeReference, parser: readts.Parser) {
 		// Hack to recognize arrays, TypeScript services doesn't seem to export
 		// the array symbol it uses internally to detect array types
 		// so just check the name.
-		if(type.target.symbol.getName() == 'Array' && type.typeArguments) {
+		if(type.target.symbol && type.target.symbol.getName() == 'Array' && type.typeArguments) {
 			this.arrayOf = new TypeSpec(type.typeArguments[0], parser);
 		} else {
 			this.parseClass(type, parser);
@@ -71,7 +71,7 @@ export class TypeSpec {
 		}
 	}
 
-	private parseList(typeList: ts.Type[], parser: readts.Parser) {
+	private parseList(typeList: ReadonlyArray<ts.Type>, parser: readts.Parser) {
 		return(typeList.map((type: ts.Type) => new TypeSpec(type, parser)));
 	}
 

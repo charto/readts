@@ -11,7 +11,7 @@ import { SymbolSpec } from './Parser';
 export class FunctionSpec {
 	/** @ignore internal use. */
 
-	constructor(spec: SymbolSpec) {
+	constructor(spec?: SymbolSpec) {
 		if(spec) {
 			this.name = spec.name;
 		}
@@ -24,7 +24,7 @@ export class FunctionSpec {
 	}
 
 	/** Function name. */
-	name: string;
+	name?: string;
 	/** List of signatures, one for each overload. */
 	signatureList: readts.SignatureSpec[] = [];
 }

@@ -27,7 +27,7 @@ export class EnumSpec {
 
 	/** Class name. */
 	name: string;
-	pos: readts.SourcePos;
+	pos?: readts.SourcePos;
 	/** Symbol from TypeScript services. @ignore internal use. */
 	symbol: ts.Symbol;
 	/** Public properties. */

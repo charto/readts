@@ -7,15 +7,11 @@ import * as readts from './index';
 /** Index signature. */
 
 export class IndexSpec {
-	/** @ignore internal use. */
 
-	constructor(signature: readts.TypeSpec, value: readts.TypeSpec) {
-		this.signature = signature;
-		this.value = value;
-	}
+	/** @ignore internal use.
+	  * @param signature Signature type.
+	  * @param value Value type. */
 
-	/** Singature type. */
-	signature: readts.TypeSpec;
-	/** Value type */
-	value: readts.TypeSpec;
+	constructor(public signature?: readts.TypeSpec, public value?: readts.TypeSpec) {}
+
 }

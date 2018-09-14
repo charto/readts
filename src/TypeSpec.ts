@@ -9,7 +9,7 @@ export type FormatHook = (spec: TypeSpec, output?: string, hooks?: FormatHooks) 
 /** Hooks to change how parts of type definitions are converted to strings. */
 
 export interface FormatHooks {
-	[name: string]: FormatHook;
+	[name: string]: FormatHook | undefined;
 
 	unknown?: FormatHook;
 	ref?: FormatHook;
@@ -25,10 +25,8 @@ export class TypeSpec {
 	/** Parse a type from TypeScript services. @ignore internal use. */
 
 	constructor(type: ts.Type, parser: readts.Parser) {
-		var tf = ts.TypeFlags;
-		var oFlags = ts.ObjectFlags;
-
-		// console.log(Object.keys(tf).map((name: string) => type.flags & tf[name] ? name : null).filter((name) => !!name).join(' | '));
+		const tf = ts.TypeFlags;
+		const oFlags = ts.ObjectFlags;
 
 		if(type.flags & tf.EnumLiteral){
 			if(type.flags & tf.Union) {
@@ -104,8 +102,8 @@ export class TypeSpec {
 	/** Convert to string, with optional hooks replacing default formatting code. */
 
 	format(hooks?: FormatHooks, needParens?: boolean): string {
-		var output: string;
-		var hook: FormatHook;
+		let output: string | undefined;
+		let hook: FormatHook | undefined;
 
 		if(!hooks) hooks = {};
 
@@ -143,7 +141,7 @@ export class TypeSpec {
 
 		if(needParens) output = '(' + output + ')';
 
-		return(hook ? hook(this, output, hooks) : output);
+		return(hook ? hook(this, output, hooks) : output || '');
 	}
 
 	/** Name of the type, only present if not composed of other type or class etc. */

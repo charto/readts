@@ -18,9 +18,9 @@ export interface SourcePos {
 export interface SymbolSpec {
 	name: string;
 	symbol: ts.Symbol;
-	declaration: ts.Declaration;
-	type: ts.Type;
-	pos: SourcePos;
+	declaration?: ts.Declaration;
+	type?: ts.Type;
+	pos?: SourcePos;
 	doc: string;
 }
 
@@ -39,8 +39,11 @@ export class Parser {
 	/** Parse a tsconfig.json file using TypeScript services API. */
 
 	parseConfig(tsconfigPath: string) {
-		var configJson = ts.parseConfigFileTextToJson(tsconfigPath, ts.sys.readFile(tsconfigPath)).config;
-		var config = ts.parseJsonConfigFileContent(configJson, ts.sys, tsconfigPath.replace(/[^/]+$/, ''), {}, tsconfigPath);
+		const txt = ts.sys.readFile(tsconfigPath);
+		if(!txt) return({});
+
+		const configJson = ts.parseConfigFileTextToJson(tsconfigPath, txt).config;
+		const config = ts.parseJsonConfigFileContent(configJson, ts.sys, tsconfigPath.replace(/[^/]+$/, ''), {}, tsconfigPath);
 
 		return(config);
 	}
@@ -52,14 +55,14 @@ export class Parser {
 		nameFilter?: (pathName: string) => boolean,
 		extension?: string
 	): readts.ModuleSpec[] {
-		var sourceNum = 0;
+		let sourceNum = 0;
 
 		this.program = ts.createProgram(config.fileNames, config.options);
 		this.checker = this.program.getTypeChecker();
 		this.moduleList = [];
 		this.symbolTbl = {};
 
-		for(var source of this.program.getSourceFiles()) {
+		for(let source of this.program.getSourceFiles()) {
 			// Skip contents of the default library.
 			if(sourceNum++ == 0) continue;
 
@@ -85,23 +88,25 @@ export class Parser {
 	/** Get or change reference for a symbol. @ignore internal use. */
 
 	getRef(symbol: ts.Symbol, ref?: RefSpec) {
-		var name = symbol.getName();
-		var symbolList = this.symbolTbl[name];
+		const name = symbol.getName();
+		let symbolList = this.symbolTbl[name];
+
+		if(!ref) ref = {};
 
 		if(!symbolList) {
 			symbolList = [];
 			this.symbolTbl[name] = symbolList;
 		} else {
-			for(var match of symbolList) {
+			for(let match of symbolList) {
 				if(symbol == match.symbol) {
-					if(ref) for(var key of Object.keys(ref)) match[key] = ref[key];
+					for(let key of Object.keys(ref)) {
+						match[key] = ref[key];
+					}
 
 					return(match);
 				}
 			}
 		}
-
-		if(!ref) ref = {};
 
 		ref.name = name;
 		ref.symbol = symbol;
@@ -111,23 +116,23 @@ export class Parser {
 	}
 
 	private parseType(type: ts.Type) {
-		var spec = new readts.TypeSpec(type, this);
+		const spec = new readts.TypeSpec(type, this);
 
 		return(spec);
 	}
 
 	private parseSource(source: ts.SourceFile) {
-		var symbol = this.checker.getSymbolAtLocation(source);
-		if(!symbol) return;
+		const symbol = this.checker.getSymbolAtLocation(source);
+		if(!symbol || !symbol.exports) return;
 
-		var exportTbl = symbol.exports;
+		const exportTbl = symbol.exports;
 
-		for(var name of this.getKeys(exportTbl).sort()) {
-			var spec = this.parseSymbol(exportTbl.get(name));
+		for(let name of this.getKeys(exportTbl).sort()) {
+			let spec = this.parseSymbol(exportTbl.get(name)!);
 
 			// Resolve aliases.
 			while(1) {
-				var symbolFlags = spec.symbol.getFlags();
+				const symbolFlags = spec.symbol.getFlags();
 
 				if(symbolFlags & ts.SymbolFlags.Alias) {
 					spec = this.parseSymbol(this.checker.getAliasedSymbol(spec.symbol));
@@ -135,7 +140,7 @@ export class Parser {
 			}
 
 			if(spec.declaration) {
-				var module = new readts.ModuleSpec();
+				const module = new readts.ModuleSpec();
 
 				this.parseDeclaration(spec, module);
 
@@ -147,25 +152,25 @@ export class Parser {
 	/** Extract declared function, class or interface from a symbol. */
 
 	private parseDeclaration(spec: SymbolSpec, moduleSpec: readts.ModuleSpec) {
-		var node = spec.declaration as ts.Node;
+		const node = spec.declaration as ts.Node;
 
 		switch(node.kind) {
 			case ts.SyntaxKind.FunctionDeclaration:
 				if(spec) {
-					var functionSpec = this.parseFunction(spec);
+					const functionSpec = this.parseFunction(spec);
 					if(functionSpec) moduleSpec.addFunction(functionSpec);
 				}
 				break;
 			case ts.SyntaxKind.EnumDeclaration:
-				if (spec) {
-					var enumSpec = this.parseEnum(spec);
+				if(spec) {
+					const enumSpec = this.parseEnum(spec);
 					if(enumSpec) moduleSpec.addEnum(enumSpec);
 				}
 				break;
 			case ts.SyntaxKind.ClassDeclaration:
 			case ts.SyntaxKind.InterfaceDeclaration:
 				if(spec) {
-					var classSpec = this.parseClass(spec);
+					const classSpec = this.parseClass(spec);
 					if(classSpec) {
 						if(node.kind == ts.SyntaxKind.InterfaceDeclaration) {
 							moduleSpec.addInterface(classSpec);
@@ -181,7 +186,7 @@ export class Parser {
 	}
 
 	private parsePos(node: ts.Declaration): SourcePos {
-		var source = node.getSourceFile();
+		const source = node.getSourceFile();
 
 		return({
 			sourcePath: source.fileName,
@@ -191,19 +196,19 @@ export class Parser {
 	}
 
 	private parseSymbol(symbol: ts.Symbol) {
-		var declaration = symbol.valueDeclaration;
-		var type: ts.Type = null;
-		var pos: SourcePos = null;
+		let declaration: ts.Declaration | undefined = symbol.valueDeclaration;
+		let type: ts.Type | undefined;
+		let pos: SourcePos | undefined;
 
 		// Interfaces have no value declaration.
-		if(!declaration) declaration = symbol.getDeclarations()[0];
+		// In a merged declaration with enums, valueDeclaration is ModuleDeclaration.
+		if(!declaration || declaration.kind == ts.SyntaxKind.ModuleDeclaration) {
+			const declarationList = symbol.getDeclarations();
+			const first = declarationList && declarationList[0];
 
-		// On merged declaration with enums, valueDeclaration is ModuleDeclaration.
-		if(declaration.kind == ts.SyntaxKind.ModuleDeclaration) {
-			const first = symbol.getDeclarations()[0];
-
-			if(first.kind == ts.SyntaxKind.InterfaceDeclaration)
+			if(!declaration || (first && first.kind == ts.SyntaxKind.InterfaceDeclaration)) {
 				declaration = first;
+			}
 		}
 
 		if(declaration) {
@@ -224,17 +229,17 @@ export class Parser {
 	}
 
 	private parseEnum(spec: SymbolSpec) {
-		var enumSpec = new readts.EnumSpec(spec);
+		const enumSpec = new readts.EnumSpec(spec);
 
 		this.getRef(spec.symbol, { enum: enumSpec });
 
 		if(spec.symbol.getFlags() & hasExports) {
-			var exportTbl = spec.symbol.exports;
+			const exportTbl = spec.symbol.exports;
 
 			for(let key of this.getKeys(exportTbl)) {
-				const symbol = exportTbl.get(key);
+				const symbol = exportTbl!.get(key);
 
-				const spec = this.parseSymbol(exportTbl.get(key));
+				const spec = this.parseSymbol(exportTbl!.get(key)!);
 
 				if(!spec) continue;
 
@@ -248,21 +253,21 @@ export class Parser {
 	}
 
 	private parseClass(spec: SymbolSpec) {
-		var classSpec = new readts.ClassSpec(spec);
+		const classSpec = new readts.ClassSpec(spec);
 
 		this.getRef(spec.symbol, { class: classSpec });
 
 		// Interfaces have no value type.
 		if(spec.type) {
-			for(var signature of spec.type.getConstructSignatures()) {
+			for(let signature of spec.type.getConstructSignatures()) {
 				classSpec.addConstructor(this.parseSignature(signature));
 			}
 		}
 
-		var memberTbl = spec.symbol.members;
+		const memberTbl = spec.symbol.members;
 
 		for(let key of this.getKeys(memberTbl)) {
-			const spec = this.parseSymbol(memberTbl.get(key));
+			const spec = this.parseSymbol(memberTbl!.get(key)!);
 
 			if(!spec) continue;
 
@@ -276,7 +281,7 @@ export class Parser {
 				classSpec.addMethod(this.parseFunction(spec));
 			} else if(symbolFlags & ts.SymbolFlags.Property) {
 				classSpec.addProperty(this.parseIdentifier(spec, !!(symbolFlags & ts.SymbolFlags.Optional)));
-			} else if(ts.isIndexSignatureDeclaration(spec.declaration)) {
+			} else if(spec.declaration && ts.isIndexSignatureDeclaration(spec.declaration)) {
 				classSpec.index = this.parseIndex(spec);
 			}
 		}
@@ -300,13 +305,13 @@ export class Parser {
 		}
 
 		if(spec.symbol.getFlags() & hasExports) {
-			var exportTbl = spec.symbol.exports;
+			const exportTbl = spec.symbol.exports;
 
 			for(let key of this.getKeys(exportTbl)) {
-				const symbol = exportTbl.get(key);
+				const symbol = exportTbl!.get(key)!;
 
 				if(!(symbol.getFlags() & ts.SymbolFlags.ClassMember)) {
-					const spec = this.parseSymbol(exportTbl.get(key));
+					const spec = this.parseSymbol(symbol);
 
 					if(!spec) continue;
 
@@ -319,82 +324,114 @@ export class Parser {
 	}
 
 	private parseFunction(spec: SymbolSpec) {
-		var funcSpec = new readts.FunctionSpec(spec);
+		const funcSpec = new readts.FunctionSpec(spec);
 
-		for(var signature of spec.type.getCallSignatures()) {
-			funcSpec.addSignature(this.parseSignature(signature));
+		if(spec.type) {
+			for(let signature of spec.type.getCallSignatures()) {
+				funcSpec.addSignature(this.parseSignature(signature));
+			}
 		}
 
 		return(funcSpec);
 	}
 
 	private parseIndex(spec: SymbolSpec) {
-		var declaration = spec.declaration as ts.IndexSignatureDeclaration;
-		var parameter = declaration.parameters[0] as ts.ParameterDeclaration;
+		const declaration = spec.declaration as ts.IndexSignatureDeclaration;
+		const parameter = declaration.parameters[0] as ts.ParameterDeclaration;
 
 		// ParameterDeclaration does have symbol, even though it is not on interfaces.
-		var singatureType = this.parseType(this.checker.getTypeOfSymbolAtLocation((<any>parameter).symbol, parameter.type));
-		var valueType = this.parseType(this.checker.getTypeAtLocation(declaration.type));
+		const signatureType = (
+			parameter.type &&
+			this.parseType(this.checker.getTypeOfSymbolAtLocation(
+				(<any>parameter).symbol,
+				parameter.type
+			))
+		);
 
-		var indexSpec =  new readts.IndexSpec(singatureType, valueType);
+		const valueType = (
+			declaration.type &&
+			this.parseType(this.checker.getTypeAtLocation(declaration.type))
+		);
+
+		const indexSpec = new readts.IndexSpec(signatureType, valueType);
 		return(indexSpec);
 	}
 
 	/** Parse property, function / method parameter or variable. */
 
 	private parseIdentifier(spec: SymbolSpec, optional: boolean) {
-		var varSpec = new readts.IdentifierSpec(spec, this.parseType(spec.type), optional);
+		const varSpec = (
+			new readts.IdentifierSpec(spec, spec.type && this.parseType(spec.type), optional)
+		);
+
 		return(varSpec);
 	}
 
 	/** Parse function / method signature. */
 
 	private parseSignature(signature: ts.Signature) {
-		var pos: SourcePos;
-		var declaration = signature.getDeclaration();
+		let pos: SourcePos | undefined;
+		const declaration = signature.getDeclaration();
 
 		if(declaration) pos = this.parsePos(declaration);
 
-		var signatureSpec = new readts.SignatureSpec(
+		const signatureSpec = new readts.SignatureSpec(
 			pos,
 			this.parseType(signature.getReturnType()),
 			this.parseComment(signature)
 		);
 
-		for(var param of signature.parameters) {
-			var spec = this.parseSymbol(param);
-			if(spec) signatureSpec.addParam(this.parseIdentifier(spec, this.checker.isOptionalParameter(spec.declaration as ts.ParameterDeclaration)));
+		for(let param of signature.parameters) {
+			const spec = this.parseSymbol(param);
+
+			signatureSpec.addParam(
+				this.parseIdentifier(
+					spec,
+					this.checker.isOptionalParameter(spec.declaration as ts.ParameterDeclaration)
+				)
+			);
 		}
 
 		return(signatureSpec);
 	}
 
-	private getKeys<T>(map: ts.ReadonlyUnderscoreEscapedMap<T>): ts.__String[] {
+	private getKeys<T>(map?: ts.ReadonlyUnderscoreEscapedMap<T>): ts.__String[] {
 		const keys: ts.__String[] = [];
-		map.forEach((_, key) => keys.push(key));
+
+		if(map) {
+			map.forEach((_, key) => keys.push(key));
+		}
+
 		return(keys);
 	}
 
 	private getOwnEmitOutputFilePath(sourceFile: ts.SourceFile, program: ts.Program, extension: string): string {
-		var getCanonicalFileName = (ts as any).createGetCanonicalFileName(ts.sys.useCaseSensitiveFileNames);
-		var host = {
+		const getCanonicalFileName = (ts as any).createGetCanonicalFileName(ts.sys.useCaseSensitiveFileNames);
+		const host = {
 			getCanonicalFileName,
 			getCommonSourceDirectory: (program as any).getCommonSourceDirectory,
 			getCompilerOptions: program.getCompilerOptions,
 			getCurrentDirectory: program.getCurrentDirectory,
 		};
+
+		/** The internal getOwnEmitOutputFilePath function in TypeScript 2.7.x
+		  * expects an object with a fileName property, 3.0.x expects a string.
+		  * A string object can satisfy both. */
 		const shim = new String(sourceFile.fileName || sourceFile);
 		(shim as any).fileName = shim;
 
-		var outPath = (ts as any).getOwnEmitOutputFilePath(shim, host, extension);
+		const outPath = (ts as any).getOwnEmitOutputFilePath(shim, host, extension);
 		return(path.resolve(program.getCurrentDirectory(), outPath));
 	}
 
 	/** TypeScript services API object. */
 	private program: ts.Program;
+
 	/** TypeScript services type checker. */
 	private checker: ts.TypeChecker;
+
 	/** List of modules found while parsing. */
 	private moduleList: readts.ModuleSpec[];
+
 	private symbolTbl: { [name: string]: RefSpec[] };
 }

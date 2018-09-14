@@ -9,26 +9,23 @@ import { SymbolSpec } from './Parser';
 /** Property, function / method parameter or variable. */
 
 export class IdentifierSpec {
-	/** @ignore internal use. */
 
-	constructor(spec: SymbolSpec, type: readts.TypeSpec, optional: boolean) {
+	/** @ignore internal use.
+	  * @param type Type definition.
+	  * @param optional Interface members and function / method parameters may be optional. */
+
+	constructor(spec: SymbolSpec, public type: readts.TypeSpec | undefined, public optional: boolean) {
 		this.name = spec.name;
-		this.type = type;
-		this.value = type.value;
-		this.optional = optional;
+		if(type) this.value = type.value;
 		this.pos = spec.pos;
 		if(spec.doc) this.doc = spec.doc;
 	}
 
 	/** Identifier name. */
 	name: string;
-	pos: readts.SourcePos;
-	/** Type definition. */
-	type: readts.TypeSpec;
+	pos?: readts.SourcePos;
 	/** Literal type value */
 	value?: any;
-	/** Interface members and function / method parameters may be optional. */
-	optional: boolean;
 	/** JSDoc comment. */
-	doc: string;
+	doc?: string;
 }

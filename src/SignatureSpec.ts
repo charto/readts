@@ -11,7 +11,7 @@ import { SymbolSpec } from './Parser';
 export class SignatureSpec {
 	/** @ignore internal use. */
 
-	constructor(pos: readts.SourcePos, returnType: readts.TypeSpec, doc: string) {
+	constructor(pos: readts.SourcePos | undefined, returnType: readts.TypeSpec, doc: string) {
 		this.pos = pos;
 		this.returnType = returnType;
 		if(doc) this.doc = doc;
@@ -23,7 +23,7 @@ export class SignatureSpec {
 		this.paramList.push(spec);
 	}
 
-	pos: readts.SourcePos;
+	pos?: readts.SourcePos;
 	/** List of parameters. */
 	paramList: readts.IdentifierSpec[] = [];
 	/** Return type definition. */

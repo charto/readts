@@ -23,7 +23,7 @@ export class ClassSpec {
 	/** Add constructor signature. @ignore internal use. */
 
 	addConstructor(spec: readts.SignatureSpec) {
-		if(!this.construct) this.construct = new readts.FunctionSpec(null);
+		if(!this.construct) this.construct = new readts.FunctionSpec();
 
 		this.construct.addSignature(spec);
 	}
@@ -54,7 +54,7 @@ export class ClassSpec {
 
 	/** Class name. */
 	name: string;
-	pos: readts.SourcePos;
+	pos?: readts.SourcePos;
 	/** Symbol from TypeScript services. @ignore internal use. */
 	symbol: ts.Symbol;
 	/** Constructor function. */

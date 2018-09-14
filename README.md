@@ -252,4 +252,4 @@ License
 
 [The MIT License](https://raw.githubusercontent.com/charto/readts/master/LICENSE)
 
-Copyright (c) 2016 BusFaster Ltd
+Copyright (c) 2016- [readts authors](https://raw.githubusercontent.com/charto/readts/master/AUTHORS).

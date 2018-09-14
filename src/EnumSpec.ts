@@ -1,4 +1,4 @@
-// This file is part of readts, copyright (c) 2018 Arttu Liimola.
+// Copyright (c) 2018- readts authors, see AUTHORS.
 // Released under the MIT license, see LICENSE.
 
 import * as ts from 'typescript';

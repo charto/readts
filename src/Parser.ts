@@ -1,4 +1,4 @@
-// This file is part of readts, copyright (c) 2016 BusFaster Ltd.
+// Copyright (c) 2016- readts authors, see AUTHORS.
 // Released under the MIT license, see LICENSE.
 
 import * as path from 'path';

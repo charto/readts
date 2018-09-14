@@ -1,13 +1,13 @@
 {
   "name": "readts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "TypeScript exported definitions parser",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
     "tsc": "tsc",
     "docts": "docts",
-    "prepublish": "tsc",
+    "prepublish": "tsc -p src",
     "test": "node dist/index.js"
   },
   "author": "Juha Järvi",
@@ -20,11 +20,12 @@
     "url": "https://github.com/charto/readts/issues"
   },
   "homepage": "https://github.com/charto/readts#readme",
-  "devDependencies": {
-    "@types/node": "^8.9.4",
-    "docts": "~0.2.0"
+  "peerDependencies": {
+    "typescript": "^2.7.0 || ^3.0.0"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@types/node": "^10.9.4",
+    "docts": "~0.3.0",
     "typescript": "^3.0.3"
   }
 }
